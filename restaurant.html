@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>نظام المطاعم</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060c18;--bg2:#0b1425;--card:rgba(11,20,42,0.97);
+  --b:rgba(56,165,255,0.14);--c:#38bdf8;--cD:#0ea5e9;
+  --g:#22c55e;--r:#ef4444;--y:#eab308;
+  --tp:#f0f6ff;--ts:rgba(180,210,255,0.65);--tm:rgba(100,150,220,0.38);
+  --f:'Noto Kufi Arabic',sans-serif;
+}
+body{font-family:var(--f);background:linear-gradient(160deg,var(--bg),var(--bg2));min-height:100vh;color:var(--tp)}
+/* NAV */
+.nav{background:rgba(6,12,24,.98);border-bottom:1px solid var(--b);padding:0 16px;height:50px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:100;direction:rtl}
+.nav-brand{color:var(--tp);font-weight:800;font-size:15px}
+.nav-space{flex:1}
+.nav-btn{background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:8px;padding:6px 14px;color:var(--ts);font-size:12px;cursor:pointer;font-family:var(--f);transition:all .2s}
+.nav-btn.active{background:linear-gradient(135deg,var(--c),var(--cD));border-color:var(--c);color:#fff;font-weight:700}
+/* PAGES */
+.page{display:none;padding:16px 12px 40px;direction:rtl}
+.page.show{display:block}
+/* CARD */
+.card{max-width:600px;margin:0 auto;background:var(--card);border:1px solid var(--b);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.card-head{background:linear-gradient(135deg,rgba(6,14,32,.99),rgba(10,22,50,.99));padding:22px 24px 18px;border-bottom:1px solid var(--b);text-align:center}
+.card-head h1{font-size:22px;font-weight:800;margin-bottom:4px}
+.card-head p{font-size:12px;color:var(--ts);margin-bottom:18px}
+/* STEPS */
+.steps{display:flex;align-items:center;justify-content:center}
+.step{display:flex;flex-direction:column;align-items:center}
+.step-n{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:rgba(255,255,255,.07);color:var(--tm);transition:all .3s}
+.step-n.active{background:linear-gradient(135deg,var(--c),var(--cD));color:#fff;box-shadow:0 0 12px rgba(56,189,248,.5)}
+.step-n.done{background:linear-gradient(135deg,var(--g),#16a34a);color:#fff}
+.step-l{font-size:10px;margin-top:4px;color:var(--tm);transition:color .3s}
+.step-l.active{color:var(--c)}.step-l.done{color:var(--g)}
+.step-line{flex:1;height:2px;margin:0 6px;margin-bottom:16px;background:var(--b);transition:background .3s}
+.step-line.done{background:linear-gradient(90deg,var(--g),#16a34a)}
+/* BODY */
+.card-body{padding:22px 22px 26px}
+.s-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.s-sub{font-size:12px;color:var(--ts);margin-bottom:16px}
+/* FIELDS */
+.field{margin-bottom:14px}
+.f-lbl{font-size:12px;color:var(--ts);margin-bottom:6px;display:flex;align-items:center;justify-content:flex-end;gap:4px}
+.req{color:var(--r)}
+.field input,.field textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:9px;padding:11px 13px;color:var(--tp);font-size:13px;font-family:var(--f);direction:rtl;outline:none;transition:border-color .2s}
+.field input:focus,.field textarea:focus{border-color:var(--c);box-shadow:0 0 0 3px rgba(56,189,248,.1)}
+.field input.err{border-color:rgba(239,68,68,.5)}
+.field textarea{resize:vertical;min-height:75px}
+.f-err{font-size:11px;color:#f87171;margin-top:4px;text-align:right;display:none}
+/* POS ROW */
+.pos-row{display:flex;gap:8px}
+.pos-row input{flex:1}
+.scan-btn{background:linear-gradient(135deg,var(--c),var(--cD));border:none;border-radius:9px;padding:0 14px;color:#fff;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+/* PHOTO */
+.photo-box{border:2px dashed rgba(56,165,255,.3);border-radius:9px;padding:18px 14px;text-align:center;cursor:pointer;position:relative;background:rgba(255,255,255,.03);transition:border-color .2s}
+.photo-box:hover{border-color:var(--c)}
+.photo-box input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.photo-preview{width:100%;border-radius:9px;margin-top:8px;max-height:180px;object-fit:cover;border:1px solid var(--b);display:none}
+/* BTNS */
+.btn-row{display:flex;gap:10px;margin-top:20px}
+.btn-next{flex:1;background:linear-gradient(135deg,var(--c),var(--cD));border:none;border-radius:9px;padding:13px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--f);box-shadow:0 4px 18px rgba(14,165,233,.35)}
+.btn-send{flex:1;background:linear-gradient(135deg,var(--g),#16a34a);border:none;border-radius:9px;padding:13px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--f);box-shadow:0 4px 18px rgba(34,197,94,.35)}
+.btn-send:disabled{opacity:.5;cursor:not-allowed}
+.btn-back{background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:9px;padding:13px 16px;color:var(--ts);font-size:13px;cursor:pointer;font-family:var(--f)}
+/* REVIEW */
+.rev-block{background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:11px;padding:13px 16px;margin-bottom:12px}
+.rev-title{color:var(--c);font-size:12px;font-weight:700;margin-bottom:10px}
+.rev-row{display:flex;justify-content:space-between;margin-bottom:7px;font-size:12px}
+.rev-key{color:var(--ts)}.rev-val{color:var(--tp);font-weight:600;direction:ltr;text-align:left;max-width:55%}
+.rev-img{width:100%;border-radius:8px;margin-top:8px;max-height:140px;object-fit:cover}
+/* SUCCESS */
+.success{text-align:center;padding:44px 24px}
+.success .ico{font-size:60px;margin-bottom:14px}
+.success h2{color:var(--g);font-size:20px;font-weight:800;margin-bottom:8px}
+.success p{color:var(--ts);font-size:13px;margin-bottom:14px}
+.s-badge{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:9px;padding:8px 16px;color:var(--g);font-weight:700;display:inline-block;margin-bottom:12px;font-size:13px}
+.s-status{border-radius:8px;padding:7px 14px;font-size:12px;display:inline-block;margin-bottom:20px}
+.s-ok{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:var(--g)}
+.s-local{background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);color:var(--c)}
+/* SCANNER */
+.scanner{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+.scanner.open{display:flex}
+.scanner-box{background:#0b1425;border:1px solid var(--b);border-radius:20px;padding:18px;width:100%;max-width:370px}
+.scanner-box h3{color:var(--tp);text-align:center;font-size:14px;margin-bottom:12px;direction:rtl}
+.vid-wrap{position:relative;border-radius:12px;overflow:hidden;background:#000}
+#scanVideo{width:100%;display:block;max-height:260px;object-fit:cover}
+.scan-overlay{position:absolute;inset:0;pointer-events:none}
+.scan-line{position:absolute;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);animation:scanmove 1.8s ease-in-out infinite}
+@keyframes scanmove{0%,100%{top:15%;opacity:0}10%{opacity:1}50%{top:78%}90%{opacity:1}}
+.corner{position:absolute;width:22px;height:22px}
+.c-tl{top:12%;left:12%;border-top:2px solid var(--c);border-left:2px solid var(--c)}
+.c-tr{top:12%;right:12%;border-top:2px solid var(--c);border-right:2px solid var(--c)}
+.c-bl{bottom:12%;left:12%;border-bottom:2px solid var(--c);border-left:2px solid var(--c)}
+.c-br{bottom:12%;right:12%;border-bottom:2px solid var(--c);border-right:2px solid var(--c)}
+.scan-status{color:var(--ts);font-size:12px;text-align:center;margin:10px 0 0;direction:rtl}
+.scan-result{margin-top:10px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);border-radius:9px;padding:9px 12px;color:var(--g);font-size:13px;text-align:center;direction:ltr;display:none}
+.scan-btns{display:flex;gap:8px;margin-top:12px}
+.scan-confirm{flex:1;background:linear-gradient(135deg,var(--g),#16a34a);border:none;border-radius:9px;padding:11px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f);display:none}
+.scan-close{flex:1;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:11px;color:var(--r);font-size:13px;cursor:pointer;font-family:var(--f)}
+/* DASHBOARD */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;max-width:900px;margin-left:auto;margin-right:auto}
+.stat-card{background:var(--card);border:1px solid var(--b);border-radius:13px;padding:14px 16px;display:flex;gap:12px;align-items:center}
+.stat-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stat-val{font-size:24px;font-weight:800;line-height:1}
+.stat-lbl{font-size:11px;color:var(--ts)}
+.toolbar{background:var(--card);border:1px solid var(--b);border-radius:13px;padding:12px 14px;margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;max-width:900px;margin-left:auto;margin-right:auto}
+.search-inp{flex:1;min-width:150px;background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:8px;padding:8px 12px;color:var(--tp);font-size:12px;outline:none;font-family:var(--f);direction:rtl}
+.filt-btn{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:7px;padding:6px 12px;color:var(--ts);font-size:11px;cursor:pointer;font-family:var(--f);transition:all .2s}
+.filt-btn.active{background:linear-gradient(135deg,var(--c),var(--cD));border-color:var(--c);color:#fff}
+.ref-btn{background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:7px;padding:6px 12px;color:var(--ts);font-size:11px;cursor:pointer;font-family:var(--f)}
+.res-count{color:var(--tm);font-size:11px}
+.table-card{background:var(--card);border:1px solid var(--b);border-radius:13px;overflow:hidden;max-width:900px;margin-left:auto;margin-right:auto}
+.table-head{padding:12px 16px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:rgba(255,255,255,.025)}
+thead th{padding:10px 12px;color:var(--tm);font-size:11px;font-weight:700;text-align:right;border-bottom:1px solid var(--b);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--b);cursor:pointer;transition:background .15s}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+tbody tr.sel{background:rgba(56,189,248,.06)}
+tbody td{padding:11px 12px;font-size:12px}
+.rest-cell{display:flex;align-items:center;gap:8px}
+.rest-av{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--c),var(--cD));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.rest-name{font-weight:700;font-size:12px;color:var(--tp)}
+.rest-id{color:var(--tm);font-size:10px}
+.badge{border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
+.b-new{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:var(--c)}
+.b-active{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--g)}
+.b-wait{background:rgba(234,179,8,.15);border:1px solid rgba(234,179,8,.3);color:var(--y)}
+.b-susp{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--r)}
+.act-btns{display:flex;gap:4px}
+.act-btn{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:5px;padding:3px 8px;color:var(--ts);font-size:10px;cursor:pointer;font-family:var(--f)}
+.act-btn.cur{background:rgba(56,189,248,.14);border-color:var(--c);color:var(--c)}
+.del-btn{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:5px;padding:3px 8px;color:var(--r);font-size:10px;cursor:pointer;font-family:var(--f)}
+.empty{text-align:center;padding:50px;color:var(--ts)}
+.empty .e-ico{font-size:40px;margin-bottom:10px}
+.detail-panel{background:var(--card);border:1px solid rgba(56,189,248,.35);border-radius:14px;padding:18px;margin-top:14px;max-width:900px;margin-left:auto;margin-right:auto;box-shadow:0 0 24px rgba(56,189,248,.08);display:none}
+.detail-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.detail-title{font-weight:800;font-size:14px;color:var(--tp)}
+.detail-close{background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:7px;padding:5px 12px;color:var(--ts);font-size:12px;cursor:pointer;font-family:var(--f)}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.detail-block{background:rgba(255,255,255,.03);border-radius:10px;padding:13px}
+.detail-block-title{color:var(--c);font-size:12px;font-weight:700;margin-bottom:10px}
+.detail-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px}
+.detail-key{color:var(--ts)}.detail-val{color:var(--tp);font-weight:600;direction:ltr;text-align:left}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltr{direction:ltr}.muted{color:var(--ts)}.vmuted{color:var(--tm);font-size:10px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="nav-brand">🍽️ نظام المطاعم</span>
+  <div class="nav-space"></div>
+  <button class="nav-btn active" id="btn-form" onclick="showView('form')">📝 تسجيل</button>
+  <button class="nav-btn" id="btn-dash" onclick="showView('dash')">📊 لوحة التحكم</button>
+</nav>
+
+<!-- ══ FORM PAGE ══ -->
+<div id="view-form" class="page show">
+  <div class="card">
+    <div class="card-head">
+      <h1>تسجيل مطعم جديد</h1>
+      <p>أدخل بيانات المطعم لإضافته إلى النظام</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-n active" id="sn1">1</div>
+          <div class="step-l active" id="sl1">بيانات المطعم</div>
+        </div>
+        <div class="step-line" id="ln1"></div>
+        <div class="step">
+          <div class="step-n" id="sn2">2</div>
+          <div class="step-l" id="sl2">بيانات الجهاز</div>
+        </div>
+        <div class="step-line" id="ln2"></div>
+        <div class="step">
+          <div class="step-n" id="sn3">3</div>
+          <div class="step-l" id="sl3">مراجعة وإرسال</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- PG1 -->
+      <div id="pg1">
+        <div class="s-title">🍽️ بيانات المطعم</div>
+        <div class="s-sub">المعلومات الأساسية للمطعم</div>
+        <div class="field">
+          <div class="f-lbl"><span class="req">*</span> اسم المطعم 🏷️</div>
+          <input id="f_name" type="text" placeholder="مثال: مطعم النخبة الذهبية">
+          <div class="f-err" id="e_name">⚠️ هذا الحقل مطلوب</div>
+        </div>
+        <div class="field">
+          <div class="f-lbl"><span class="req">*</span> اسم الموظف المسؤول 👤</div>
+          <input id="f_manager" type="text" placeholder="مثال: أحمد محمد علي">
+          <div class="f-err" id="e_manager">⚠️ هذا الحقل مطلوب</div>
+        </div>
+        <div class="field">
+          <div class="f-lbl"><span class="req">*</span> العنوان 📍</div>
+          <input id="f_address" type="text" placeholder="المحافظة، المنطقة، الشارع">
+          <div class="f-err" id="e_address">⚠️ هذا الحقل مطلوب</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-next" onclick="next1()">التالي: بيانات الجهاز ←</button>
+          <button class="btn-back" onclick="clearPg1()">🗑️ مسح</button>
+        </div>
+      </div>
+
+      <!-- PG2 -->
+      <div id="pg2" style="display:none">
+        <div class="s-title">🖥️ بيانات الجهاز</div>
+        <div class="s-sub">معلومات جهاز POS والاتصال</div>
+        <div class="field">
+          <div class="f-lbl"><span class="req">*</span> رقم جهاز POS 🖥️</div>
+          <div class="pos-row">
+            <input id="f_pos" type="text" placeholder="أدخل يدوياً أو امسح الباركود" dir="ltr">
+            <button class="scan-btn" onclick="openScan('f_pos','POS')">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
+                <rect x="2" y="2" width="5" height="5" rx="1"/><rect x="17" y="2" width="5" height="5" rx="1"/>
+                <rect x="2" y="17" width="5" height="5" rx="1"/><line x1="9" y1="3.5" x2="9" y2="8.5"/>
+                <line x1="12" y1="3.5" x2="12" y2="8.5"/><line x1="17" y1="9" x2="22" y2="9"/>
+                <line x1="9" y1="12" x2="9" y2="22"/><line x1="12" y1="12" x2="15" y2="12"/>
+                <line x1="12" y1="15" x2="12" y2="22"/><line x1="15" y1="18" x2="22" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="f-err" id="e_pos">⚠️ هذا الحقل مطلوب</div>
+        </div>
+        <div class="field">
+          <div class="f-lbl"><span class="req">*</span> رقم SIM كارت POS 📡</div>
+          <div class="pos-row">
+            <input id="f_sim" type="text" placeholder="أدخل يدوياً أو امسح الباركود" dir="ltr">
+            <button class="scan-btn" onclick="openScan('f_sim','SIM')">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
+                <rect x="2" y="2" width="5" height="5" rx="1"/><rect x="17" y="2" width="5" height="5" rx="1"/>
+                <rect x="2" y="17" width="5" height="5" rx="1"/><line x1="9" y1="3.5" x2="9" y2="8.5"/>
+                <line x1="12" y1="3.5" x2="12" y2="8.5"/><line x1="17" y1="9" x2="22" y2="9"/>
+                <line x1="9" y1="12" x2="9" y2="22"/><line x1="12" y1="12" x2="15" y2="12"/>
+                <line x1="12" y1="15" x2="12" y2="22"/><line x1="15" y1="18" x2="22" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="f-err" id="e_sim">⚠️ هذا الحقل مطلوب</div>
+        </div>
+        <div class="field">
+          <div class="f-lbl">صورة المطعم 📸</div>
+          <div class="photo-box">
+            <input type="file" id="f_photo" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+            <div style="font-size:28px;margin-bottom:6px">📷</div>
+            <div id="photoTxt" style="color:var(--ts);font-size:12px">اضغط لالتقاط صورة أو اختيار من المعرض</div>
+          </div>
+          <img id="photoPreview" class="photo-preview" alt="preview">
+        </div>
+        <div class="field">
+          <div class="f-lbl">ملاحظات 📋</div>
+          <textarea id="f_notes" placeholder="أي معلومات إضافية..." maxlength="200"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn-next" onclick="next2()">التالي: مراجعة وإرسال ←</button>
+          <button class="btn-back" onclick="showPg(1)">→ رجوع</button>
+        </div>
+      </div>
+
+      <!-- PG3 -->
+      <div id="pg3" style="display:none">
+        <div class="s-title">✅ مراجعة وإرسال</div>
+        <div class="s-sub">تحقق من البيانات قبل الإرسال</div>
+        <div id="reviewArea"></div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn-send" id="sendBtn" onclick="submitForm()">✅ إرسال وتسجيل</button>
+          <button class="btn-back" onclick="showPg(2)">→ رجوع</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div id="pgSuccess" style="display:none" class="success">
+        <div class="ico">🎉</div>
+        <h2>تم التسجيل بنجاح!</h2>
+        <p>تم حفظ بيانات المطعم وإرسالها إلى النظام</p>
+        <div class="s-badge" id="regId"></div><br><br>
+        <div class="s-status" id="sheetSt"></div>
+        <br><br>
+        <button class="btn-next" style="max-width:280px;margin:0 auto;display:block" onclick="resetAll()">✚ تسجيل مطعم جديد</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ DASH PAGE ══ -->
+<div id="view-dash" class="page">
+  <div class="stat-grid" id="statGrid">
+    <div class="stat-card"><div class="stat-ico" style="background:rgba(56,189,248,.15)">🍽️</div><div><div class="stat-lbl">إجمالي المطاعم</div><div class="stat-val" id="st0" style="color:var(--c)">0</div></div></div>
+    <div class="stat-card"><div class="stat-ico" style="background:rgba(34,197,94,.15)">✅</div><div><div class="stat-lbl">نشط</div><div class="stat-val" id="st1" style="color:var(--g)">0</div></div></div>
+    <div class="stat-card"><div class="stat-ico" style="background:rgba(234,179,8,.15)">⏳</div><div><div class="stat-lbl">انتظار</div><div class="stat-val" id="st2" style="color:var(--y)">0</div></div></div>
+    <div class="stat-card"><div class="stat-ico" style="background:rgba(239,68,68,.15)">⛔</div><div><div class="stat-lbl">معلق</div><div class="stat-val" id="st3" style="color:var(--r)">0</div></div></div>
+  </div>
+  <div class="toolbar">
+    <input class="search-inp" id="searchInp" placeholder="🔍 بحث بالاسم أو رقم POS..." oninput="renderTable()">
+    <button class="filt-btn active" onclick="setFilt('الكل',this)">الكل</button>
+    <button class="filt-btn" onclick="setFilt('جديد',this)">جديد</button>
+    <button class="filt-btn" onclick="setFilt('نشط',this)">نشط</button>
+    <button class="filt-btn" onclick="setFilt('انتظار',this)">انتظار</button>
+    <button class="filt-btn" onclick="setFilt('معلق',this)">معلق</button>
+    <button class="ref-btn" onclick="loadDash()">🔄</button>
+    <span class="res-count" id="resCount">0 نتيجة</span>
+  </div>
+  <div class="table-card">
+    <div class="table-head">
+      <span style="font-weight:700;font-size:13px;color:var(--tp)">📋 قائمة المطاعم</span>
+      <span style="color:var(--tm);font-size:11px">💾 تخزين مشترك</span>
+    </div>
+    <div id="tableBody"><div class="empty"><div class="e-ico">⏳</div>جاري التحميل...</div></div>
+  </div>
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-top">
+      <span class="detail-title" id="detailTitle">تفاصيل المطعم</span>
+      <button class="detail-close" onclick="closeDetail()">✕ إغلاق</button>
+    </div>
+    <div class="detail-grid" id="detailGrid"></div>
+  </div>
+</div>
+
+<!-- ══ SCANNER ══ -->
+<div class="scanner" id="scannerWrap">
+  <div class="scanner-box">
+    <h3 id="scanTitle">📷 مسح الباركود</h3>
+    <div class="vid-wrap">
+      <video id="scanVideo" autoplay playsinline muted></video>
+      <div class="scan-overlay">
+        <div class="scan-line"></div>
+        <div class="corner c-tl"></div><div class="corner c-tr"></div>
+        <div class="corner c-bl"></div><div class="corner c-br"></div>
+      </div>
+    </div>
+    <div class="scan-status" id="scanStatus">جاري تشغيل الكاميرا...</div>
+    <div class="scan-result" id="scanResult"></div>
+    <div class="scan-btns">
+      <button class="scan-confirm" id="scanConfirm" onclick="confirmScan()">✅ تأكيد</button>
+      <button class="scan-close" onclick="closeScan()">✕ إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzEOTNi8FA-EtGkwp8tfRD_fOq_y97Qn5_q4hejQJiCHb9sZmvn2m54ikFFgocWllTqA/exec";
+const DB_KEY = "resto-v2";
+
+// ══ DB ══
+function dbLoad() { try { return JSON.parse(localStorage.getItem(DB_KEY) || "[]"); } catch { return []; } }
+function dbSave(d) { try { localStorage.setItem(DB_KEY, JSON.stringify(d)); } catch {} }
+
+// ══ STATE ══
+let photoBase64 = "";
+let scanField = "";
+let scanStream = null;
+let scanFrame = null;
+let scanValue = "";
+let currentFilt = "الكل";
+let selectedId = null;
+let allRows = [];
+
+// ══ NAV ══
+function showView(v) {
+  document.getElementById("view-form").classList.toggle("show", v === "form");
+  document.getElementById("view-dash").classList.toggle("show", v === "dash");
+  document.getElementById("btn-form").classList.toggle("active", v === "form");
+  document.getElementById("btn-dash").classList.toggle("active", v === "dash");
+  if (v === "dash") loadDash();
+}
+
+// ══ STEPS ══
+function showPg(n) {
+  ["pg1","pg2","pg3","pgSuccess"].forEach(id => document.getElementById(id).style.display = "none");
+  document.getElementById("pg" + n).style.display = "block";
+  updateSteps(n);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function updateSteps(active) {
+  for (let i = 1; i <= 3; i++) {
+    const n = document.getElementById("sn" + i);
+    const l = document.getElementById("sl" + i);
+    if (i < active) { n.className = "step-n done"; n.textContent = "✓"; l.className = "step-l done"; }
+    else if (i === active) { n.className = "step-n active"; n.textContent = i; l.className = "step-l active"; }
+    else { n.className = "step-n"; n.textContent = i; l.className = "step-l"; }
+    if (i < 3) document.getElementById("ln" + i).className = "step-line" + (i < active ? " done" : "");
+  }
+}
+
+// ══ NEXT ══
+function next1() {
+  const name = document.getElementById("f_name").value.trim();
+  const mgr = document.getElementById("f_manager").value.trim();
+  const addr = document.getElementById("f_address").value.trim();
+  document.getElementById("e_name").style.display = name ? "none" : "block";
+  document.getElementById("e_manager").style.display = mgr ? "none" : "block";
+  document.getElementById("e_address").style.display = addr ? "none" : "block";
+  if (name && mgr && addr) showPg(2);
+}
+
+function next2() {
+  const pos = document.getElementById("f_pos").value.trim();
+  const sim = document.getElementById("f_sim").value.trim();
+  document.getElementById("e_pos").style.display = pos ? "none" : "block";
+  document.getElementById("e_sim").style.display = sim ? "none" : "block";
+  if (pos && sim) { buildReview(); showPg(3); }
+}
+
+function clearPg1() {
+  ["f_name","f_manager","f_address"].forEach(id => document.getElementById(id).value = "");
+  ["e_name","e_manager","e_address"].forEach(id => document.getElementById(id).style.display = "none");
+}
+
+// ══ PHOTO ══
+function handlePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    photoBase64 = e.target.result;
+    document.getElementById("photoPreview").src = photoBase64;
+    document.getElementById("photoPreview").style.display = "block";
+    document.getElementById("photoTxt").textContent = "✅ " + file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══ SCANNER ══
+async function openScan(fieldId, label) {
+  scanField = fieldId; scanValue = "";
+  document.getElementById("scanTitle").textContent = "📷 مسح باركود " + label;
+  document.getElementById("scanResult").style.display = "none";
+  document.getElementById("scanConfirm").style.display = "none";
+  document.getElementById("scanStatus").textContent = "جاري تشغيل الكاميرا...";
+  document.getElementById("scannerWrap").classList.add("open");
+  const video = document.getElementById("scanVideo");
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } });
+    video.srcObject = scanStream;
+    await video.play();
+    document.getElementById("scanStatus").textContent = "وجّه الكاميرا نحو الباركود...";
+    startScan(video);
+  } catch {
+    document.getElementById("scanStatus").textContent = "❌ لا يمكن فتح الكاميرا — افتح من Chrome وامنح الإذن";
+  }
+}
+
+function startScan(video) {
+  if (!("BarcodeDetector" in window)) {
+    document.getElementById("scanStatus").textContent = "⚠️ المتصفح لا يدعم المسح — أدخل يدوياً";
+    return;
+  }
+  const det = new BarcodeDetector({ formats: ["qr_code","code_128","code_39","ean_13","ean_8","upc_a","upc_e","itf","codabar","data_matrix"] });
+  const loop = async () => {
+    if (!scanStream) return;
+    try {
+      const res = await det.detect(video);
+      if (res.length > 0) {
+        scanValue = res[0].rawValue;
+        document.getElementById("scanResult").textContent = "✅ تم: " + scanValue;
+        document.getElementById("scanResult").style.display = "block";
+        document.getElementById("scanConfirm").style.display = "block";
+        document.getElementById("scanStatus").textContent = "✅ تم قراءة الباركود!";
+        return;
+      }
+    } catch {}
+    scanFrame = requestAnimationFrame(loop);
+  };
+  scanFrame = requestAnimationFrame(loop);
+}
+
+function confirmScan() {
+  if (scanValue && scanField) {
+    document.getElementById(scanField).value = scanValue;
+    document.getElementById("e_" + (scanField === "f_pos" ? "pos" : "sim")).style.display = "none";
+  }
+  closeScan();
+}
+
+function closeScan() {
+  if (scanFrame) { cancelAnimationFrame(scanFrame); scanFrame = null; }
+  if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+  document.getElementById("scanVideo").srcObject = null;
+  document.getElementById("scannerWrap").classList.remove("open");
+}
+
+// ══ REVIEW ══
+function buildReview() {
+  const d = getData();
+  let html = `
+    <div class="rev-block">
+      <div class="rev-title">🍽️ بيانات المطعم</div>
+      <div class="rev-row"><span class="rev-key">اسم المطعم</span><span class="rev-val">${d.restaurantName}</span></div>
+      <div class="rev-row"><span class="rev-key">الموظف</span><span class="rev-val">${d.managerName}</span></div>
+      <div class="rev-row"><span class="rev-key">العنوان</span><span class="rev-val">${d.address}</span></div>
+    </div>
+    <div class="rev-block">
+      <div class="rev-title">🖥️ بيانات الجهاز</div>
+      <div class="rev-row"><span class="rev-key">رقم POS</span><span class="rev-val">${d.posNumber}</span></div>
+      <div class="rev-row"><span class="rev-key">رقم SIM</span><span class="rev-val">${d.simNumber}</span></div>
+      ${d.notes ? `<div class="rev-row"><span class="rev-key">ملاحظات</span><span class="rev-val">${d.notes}</span></div>` : ""}
+      ${photoBase64 ? `<img src="${photoBase64}" class="rev-img">` : `<div style="font-size:11px;color:var(--tm);margin-top:4px">لم تُرفع صورة</div>`}
+    </div>`;
+  document.getElementById("reviewArea").innerHTML = html;
+}
+
+function getData() {
+  return {
+    id: "R-" + Date.now(),
+    submittedAt: new Date().toLocaleString("ar-IQ"),
+    status: "جديد",
+    restaurantName: document.getElementById("f_name").value.trim(),
+    managerName: document.getElementById("f_manager").value.trim(),
+    address: document.getElementById("f_address").value.trim(),
+    posNumber: document.getElementById("f_pos").value.trim(),
+    simNumber: document.getElementById("f_sim").value.trim(),
+    notes: document.getElementById("f_notes").value.trim(),
+    photo: photoBase64 ? "✅ موجودة" : "لا توجد",
+  };
+}
+
+// ══ SUBMIT ══
+async function submitForm() {
+  const btn = document.getElementById("sendBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span> جاري الإرسال...';
+  const data = getData();
+  const existing = dbLoad();
+  existing.push({ ...data, photoBase64 });
+  dbSave(existing);
+  let ok = false;
+  try {
+    await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: {"Content-Type":"application/json"}, body: JSON.stringify({action:"addRow",data}) });
+    ok = true;
+  } catch {}
+  ["pg1","pg2","pg3"].forEach(id => document.getElementById(id).style.display = "none");
+  document.getElementById("pgSuccess").style.display = "block";
+  document.getElementById("regId").textContent = "🔖 رقم التسجيل: " + data.id;
+  const st = document.getElementById("sheetSt");
+  st.className = ok ? "s-status s-ok" : "s-status s-local";
+  st.textContent = ok ? "✅ تم الإرسال إلى Google Sheets" : "💾 تم الحفظ في النظام";
+  updateSteps(3);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function resetAll() {
+  ["f_name","f_manager","f_address","f_pos","f_sim","f_notes"].forEach(id => document.getElementById(id).value = "");
+  photoBase64 = "";
+  document.getElementById("photoPreview").style.display = "none";
+  document.getElementById("photoPreview").src = "";
+  document.getElementById("photoTxt").textContent = "اضغط لالتقاط صورة أو اختيار من المعرض";
+  document.getElementById("f_photo").value = "";
+  document.getElementById("sendBtn").disabled = false;
+  document.getElementById("sendBtn").textContent = "✅ إرسال وتسجيل";
+  showPg(1);
+}
+
+// ══ DASHBOARD ══
+function loadDash() {
+  allRows = dbLoad();
+  updateStats();
+  renderTable();
+}
+
+function updateStats() {
+  document.getElementById("st0").textContent = allRows.length;
+  document.getElementById("st1").textContent = allRows.filter(r => r.status === "نشط").length;
+  document.getElementById("st2").textContent = allRows.filter(r => ["انتظار","جديد"].includes(r.status)).length;
+  document.getElementById("st3").textContent = allRows.filter(r => r.status === "معلق").length;
+}
+
+function setFilt(val, btn) {
+  currentFilt = val;
+  document.querySelectorAll(".filt-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderTable();
+}
+
+function badgeClass(st) {
+  return { نشط: "badge b-active", انتظار: "badge b-wait", معلق: "badge b-susp", جديد: "badge b-new" }[st] || "badge b-new";
+}
+
+function renderTable() {
+  const q = document.getElementById("searchInp").value.toLowerCase();
+  const filtered = allRows.filter(r =>
+    (!q || (r.restaurantName||"").toLowerCase().includes(q) || (r.posNumber||"").includes(q) || (r.simNumber||"").includes(q))
+    && (currentFilt === "الكل" || r.status === currentFilt)
+  );
+  document.getElementById("resCount").textContent = filtered.length + " نتيجة";
+  if (filtered.length === 0) {
+    document.getElementById("tableBody").innerHTML = `<div class="empty"><div class="e-ico">🍽️</div><div style="font-weight:700">لا توجد مطاعم</div><div style="font-size:12px;margin-top:4px">استخدم فورمة التسجيل لإضافة مطعم</div></div>`;
+    return;
+  }
+  let html = `<div class="table-wrap"><table><thead><tr>
+    <th>#</th><th>اسم المطعم</th><th>الموظف</th><th>رقم POS</th><th>رقم SIM</th><th>التاريخ</th><th>الحالة</th><th>تعديل</th>
+  </tr></thead><tbody>`;
+  filtered.forEach((row, i) => {
+    html += `<tr class="${selectedId === row.id ? 'sel' : ''}" onclick="selectRow('${row.id}')">
+      <td class="vmuted">${i+1}</td>
+      <td><div class="rest-cell"><div class="rest-av">${(row.restaurantName||"م")[0]}</div><div><div class="rest-name">${row.restaurantName||""}</div><div class="rest-id">${row.id}</div></div></div></td>
+      <td class="muted">${row.managerName||""}</td>
+      <td class="ltr" style="color:var(--c)">${row.posNumber||""}</td>
+      <td class="ltr muted">${row.simNumber||""}</td>
+      <td class="vmuted" style="white-space:nowrap">${row.submittedAt||""}</td>
+      <td><span class="${badgeClass(row.status)}">${row.status||"جديد"}</span></td>
+      <td><div class="act-btns">
+        <button class="act-btn ${row.status==='نشط'?'cur':''}" onclick="event.stopPropagation();chStatus('${row.id}','نشط')">نشط</button>
+        <button class="act-btn ${row.status==='انتظار'?'cur':''}" onclick="event.stopPropagation();chStatus('${row.id}','انتظار')">انتظار</button>
+        <button class="act-btn ${row.status==='معلق'?'cur':''}" onclick="event.stopPropagation();chStatus('${row.id}','معلق')">معلق</button>
+        <button class="del-btn" onclick="event.stopPropagation();delRow('${row.id}')">🗑️</button>
+      </div></td>
+    </tr>`;
+  });
+  html += "</tbody></table></div>";
+  document.getElementById("tableBody").innerHTML = html;
+}
+
+function chStatus(id, st) {
+  allRows = allRows.map(r => r.id === id ? {...r, status: st} : r);
+  dbSave(allRows); updateStats(); renderTable();
+  if (selectedId === id) showDetail(allRows.find(r => r.id === id));
+}
+
+function delRow(id) {
+  if (!confirm("حذف هذا المطعم؟")) return;
+  allRows = allRows.filter(r => r.id !== id);
+  dbSave(allRows); updateStats(); renderTable();
+  if (selectedId === id) closeDetail();
+}
+
+function selectRow(id) {
+  if (selectedId === id) { closeDetail(); return; }
+  selectedId = id;
+  renderTable();
+  showDetail(allRows.find(r => r.id === id));
+}
+
+function showDetail(row) {
+  if (!row) return;
+  document.getElementById("detailTitle").textContent = "📋 " + row.restaurantName;
+  document.getElementById("detailGrid").innerHTML = `
+    <div class="detail-block">
+      <div class="detail-block-title">🍽️ بيانات المطعم</div>
+      ${[["الاسم",row.restaurantName],["الموظف",row.managerName],["العنوان",row.address]].map(([k,v])=>`<div class="detail-row"><span class="detail-key">${k}</span><span class="detail-val">${v||""}</span></div>`).join("")}
+    </div>
+    <div class="detail-block">
+      <div class="detail-block-title">🖥️ بيانات الجهاز</div>
+      ${[["رقم POS",row.posNumber],["رقم SIM",row.simNumber],["التسجيل",row.submittedAt],...(row.notes?[["ملاحظات",row.notes]]:[])].map(([k,v])=>`<div class="detail-row"><span class="detail-key">${k}</span><span class="detail-val">${v||""}</span></div>`).join("")}
+      ${row.photoBase64 ? `<img src="${row.photoBase64}" style="width:100%;border-radius:8px;margin-top:8px;max-height:120px;object-fit:cover">` : ""}
+    </div>`;
+  document.getElementById("detailPanel").style.display = "block";
+  document.getElementById("detailPanel").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function closeDetail() {
+  selectedId = null;
+  document.getElementById("detailPanel").style.display = "none";
+  renderTable();
+}
+
+// ══ INIT ══
+window.onload = () => { loadDash(); };
+</script>
+</body>
+</html>
