@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>لوحة التحكم — نظام المطاعم</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#041a1a;--bg2:#062020;--card:rgba(4,26,26,0.97);
+  --b:rgba(200,230,60,0.18);--c:#c8e63c;--cD:#a8c420;
+  --g:#22c55e;--r:#ef4444;--y:#eab308;--pu:#a855f7;
+  --tp:#f0fff4;--ts:rgba(180,230,180,0.65);--tm:rgba(100,180,120,0.38);
+  --f:'Noto Kufi Arabic',sans-serif;
+}
+body{font-family:var(--f);background:linear-gradient(160deg,var(--bg),var(--bg2));min-height:100vh;color:var(--tp)}
+/* NAV */
+.nav{background:rgba(3,18,18,.98);border-bottom:1px solid var(--b);padding:0 14px;height:50px;display:flex;align-items:center;gap:6px;position:sticky;top:0;z-index:200;direction:rtl}
+.nav-brand{color:var(--tp);font-weight:800;font-size:15px}
+.nav-space{flex:1}
+.nb{background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:8px;padding:6px 12px;color:var(--ts);font-size:12px;cursor:pointer;font-family:var(--f);transition:all .2s;white-space:nowrap}
+.nb.active{background:linear-gradient(135deg,#c8e63c,#a8c420);border-color:var(--c);color:#fff;font-weight:700}
+.nb.admin-btn{border-color:rgba(168,85,247,.4);color:#c084fc}
+.nb.admin-btn.active{background:linear-gradient(135deg,#a855f7,#7c3aed);border-color:#a855f7}
+/* PAGES */
+.page{display:none;padding:14px 12px 40px;direction:rtl}
+.page.show{display:block}
+/* CARD */
+.card{max-width:600px;margin:0 auto;background:var(--card);border:1px solid var(--b);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.card-head{background:linear-gradient(135deg,rgba(3,18,18,.99),rgba(5,28,28,.99));padding:20px 22px 16px;border-bottom:1px solid var(--b);text-align:center}
+.card-head h1{font-size:21px;font-weight:800;margin-bottom:4px}
+.card-head p{font-size:12px;color:var(--ts);margin-bottom:16px}
+/* STEPS */
+.steps{display:flex;align-items:center;justify-content:center}
+.step{display:flex;flex-direction:column;align-items:center}
+.sn{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:rgba(255,255,255,.07);color:var(--tm);transition:all .3s}
+.sn.active{background:linear-gradient(135deg,#c8e63c,#a8c420);color:#1a2a00;box-shadow:0 0 10px rgba(200,230,60,.5)}
+.sn.done{background:linear-gradient(135deg,var(--g),#16a34a);color:#fff}
+.sl{font-size:10px;margin-top:4px;color:var(--tm);transition:color .3s}
+.sl.active{color:var(--c)}.sl.done{color:var(--g)}
+.sline{flex:1;height:2px;margin:0 5px;margin-bottom:14px;background:var(--b);transition:background .3s}
+.sline.done{background:linear-gradient(90deg,var(--g),#16a34a)}
+/* BODY */
+.cb{padding:20px 20px 24px}
+.st{font-size:14px;font-weight:700;margin-bottom:3px}
+.ss{font-size:12px;color:var(--ts);margin-bottom:14px}
+/* FIELDS */
+.field{margin-bottom:13px}
+.fl{font-size:12px;color:var(--ts);margin-bottom:5px;display:flex;align-items:center;justify-content:flex-end;gap:4px}
+.req{color:var(--r)}
+.fi,.ft,.fs{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:9px;padding:10px 12px;color:var(--tp);font-size:13px;font-family:var(--f);direction:rtl;outline:none;transition:border-color .2s}
+.fi:focus,.ft:focus,.fs:focus{border-color:var(--c);box-shadow:0 0 0 3px rgba(200,230,60,.1)}
+.fi.err{border-color:rgba(239,68,68,.5)}
+.ft{resize:vertical;min-height:70px}
+.fe{font-size:11px;color:#f87171;margin-top:3px;text-align:right;display:none}
+/* POS */
+.pr{display:flex;gap:8px}
+.pr .fi{flex:1}
+.sb{background:linear-gradient(135deg,#c8e63c,#a8c420);border:none;border-radius:9px;padding:0 13px;color:#1a2a00;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;min-height:42px}
+/* PHOTO */
+.pb{border:2px dashed rgba(56,165,255,.3);border-radius:9px;padding:16px 14px;text-align:center;cursor:pointer;position:relative;background:rgba(255,255,255,.03);transition:border-color .2s}
+.pb:hover{border-color:var(--c)}
+.pb input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.pp{width:100%;border-radius:9px;margin-top:8px;max-height:160px;object-fit:cover;border:1px solid var(--b);display:none}
+/* BTNS */
+.br{display:flex;gap:10px;margin-top:18px}
+.bn{flex:1;background:linear-gradient(135deg,#c8e63c,#a8c420);border:none;border-radius:9px;padding:12px;color:#1a2a00;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--f);box-shadow:0 4px 16px rgba(168,196,32,.3)}
+.bs{flex:1;background:linear-gradient(135deg,var(--g),#16a34a);border:none;border-radius:9px;padding:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--f);box-shadow:0 4px 16px rgba(34,197,94,.3)}
+.bs:disabled{opacity:.5;cursor:not-allowed}
+.bb{background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:9px;padding:12px 14px;color:var(--ts);font-size:13px;cursor:pointer;font-family:var(--f)}
+/* REVIEW */
+.rb{background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:11px;padding:12px 15px;margin-bottom:11px}
+.rt{color:var(--c);font-size:12px;font-weight:700;margin-bottom:9px}
+.rr{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px}
+.rk{color:var(--ts)}.rv{color:var(--tp);font-weight:600;direction:ltr;text-align:left;max-width:55%}
+/* SUCCESS */
+.succ{text-align:center;padding:40px 22px}
+.succ .ico{font-size:56px;margin-bottom:12px}
+.succ h2{color:var(--g);font-size:20px;font-weight:800;margin-bottom:7px}
+.succ p{color:var(--ts);font-size:13px;margin-bottom:13px}
+.sbdg{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:9px;padding:7px 14px;color:var(--g);font-weight:700;display:inline-block;margin-bottom:11px;font-size:13px}
+.sst{border-radius:8px;padding:6px 13px;font-size:12px;display:inline-block;margin-bottom:18px}
+.sok{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:var(--g)}
+.slc{background:rgba(200,230,60,.08);border:1px solid rgba(200,230,60,.25);color:var(--c)}
+/* SCANNER */
+.scn{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:9999;display:none;align-items:center;justify-content:center;padding:14px}
+.scn.open{display:flex}
+.scn-box{background:#062020;border:1px solid var(--b);border-radius:20px;padding:16px;width:100%;max-width:360px}
+.scn-box h3{color:var(--tp);text-align:center;font-size:14px;margin-bottom:11px;direction:rtl}
+.vw{position:relative;border-radius:12px;overflow:hidden;background:#000}
+#scanVid{width:100%;display:block;max-height:250px;object-fit:cover}
+.sov{position:absolute;inset:0;pointer-events:none}
+.sln{position:absolute;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);animation:scanmv 1.8s ease-in-out infinite}
+@keyframes scanmv{0%,100%{top:15%;opacity:0}10%{opacity:1}50%{top:78%}90%{opacity:1}}
+.cn{position:absolute;width:20px;height:20px}
+.ctl{top:12%;left:12%;border-top:2px solid var(--c);border-left:2px solid var(--c)}
+.ctr{top:12%;right:12%;border-top:2px solid var(--c);border-right:2px solid var(--c)}
+.cbl{bottom:12%;left:12%;border-bottom:2px solid var(--c);border-left:2px solid var(--c)}
+.cbr{bottom:12%;right:12%;border-bottom:2px solid var(--c);border-right:2px solid var(--c)}
+.sst2{color:var(--ts);font-size:12px;text-align:center;margin:9px 0 0;direction:rtl}
+.sres{margin-top:9px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);border-radius:9px;padding:8px 12px;color:var(--g);font-size:13px;text-align:center;direction:ltr;display:none}
+.scnb{display:flex;gap:8px;margin-top:11px}
+.sco{flex:1;background:linear-gradient(135deg,var(--g),#16a34a);border:none;border-radius:9px;padding:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f);display:none}
+.scx{flex:1;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:10px;color:var(--r);font-size:13px;cursor:pointer;font-family:var(--f)}
+/* DASHBOARD */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:11px;margin-bottom:14px;max-width:900px;margin-left:auto;margin-right:auto}
+.sc{background:var(--card);border:1px solid var(--b);border-radius:13px;padding:13px 14px;display:flex;gap:11px;align-items:center}
+.si{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sv{font-size:22px;font-weight:800;line-height:1}
+.slb{font-size:11px;color:var(--ts)}
+.tb{background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:13px;padding:11px 13px;margin-bottom:13px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;max-width:900px;margin-left:auto;margin-right:auto}
+.si2{flex:1;min-width:150px;background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:8px;padding:8px 11px;color:var(--tp);font-size:12px;outline:none;font-family:var(--f);direction:rtl}
+.fb{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:7px;padding:6px 11px;color:var(--ts);font-size:11px;cursor:pointer;font-family:var(--f);transition:all .2s}
+.fb.active{background:linear-gradient(135deg,#c8e63c,#a8c420);border-color:var(--c);color:#fff}
+.tc{background:var(--card);border:1px solid var(--b);border-radius:13px;overflow:hidden;max-width:900px;margin-left:auto;margin-right:auto}
+.th2{padding:11px 14px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:rgba(255,255,255,.025)}
+thead th{padding:9px 11px;color:var(--tm);font-size:11px;font-weight:700;text-align:right;border-bottom:1px solid var(--b);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--b);cursor:pointer;transition:background .15s}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody tr.sel{background:rgba(200,230,60,.06)}
+tbody td{padding:10px 11px;font-size:12px}
+.rc{display:flex;align-items:center;gap:7px}
+.ra{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#c8e63c,#a8c420);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.rn{font-weight:700;font-size:12px;color:var(--tp)}
+.ri{color:var(--tm);font-size:10px}
+.bdg{border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700}
+.bn2{background:rgba(200,230,60,.15);border:1px solid rgba(200,230,60,.3);color:var(--c)}
+.ba{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--g)}
+.bw{background:rgba(234,179,8,.15);border:1px solid rgba(234,179,8,.3);color:var(--y)}
+.bsu{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--r)}
+.ab{display:flex;gap:4px}
+.at{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:5px;padding:3px 7px;color:var(--ts);font-size:10px;cursor:pointer;font-family:var(--f)}
+.at.cur{background:rgba(200,230,60,.14);border-color:var(--c);color:var(--c)}
+.dt{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:5px;padding:3px 7px;color:var(--r);font-size:10px;cursor:pointer;font-family:var(--f)}
+.emp{text-align:center;padding:45px;color:var(--ts)}
+.dp{background:var(--card);border:1px solid rgba(200,230,60,.35);border-radius:14px;padding:16px;margin-top:13px;max-width:900px;margin-left:auto;margin-right:auto;box-shadow:0 0 22px rgba(200,230,60,.07);display:none}
+.dpt{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.dptt{font-weight:800;font-size:14px;color:var(--tp)}
+.dpc{background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:7px;padding:5px 11px;color:var(--ts);font-size:12px;cursor:pointer;font-family:var(--f)}
+.dpg{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:11px}
+.dpb{background:rgba(255,255,255,.03);border-radius:10px;padding:12px}
+.dpbt{color:var(--c);font-size:12px;font-weight:700;margin-bottom:9px}
+.dpr{display:flex;justify-content:space-between;margin-bottom:7px;font-size:12px}
+.dpk{color:var(--ts)}.dpv{color:var(--tp);font-weight:600;direction:ltr;text-align:left}
+/* ADMIN PANEL */
+.admin-wrap{max-width:750px;margin:0 auto}
+.admin-card{background:var(--card);border:1px solid var(--b);border-radius:16px;overflow:hidden;margin-bottom:16px}
+.admin-head{background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(124,58,237,.1));padding:16px 20px;border-bottom:1px solid rgba(168,85,247,.2);display:flex;align-items:center;gap:10px}
+.admin-head h2{font-size:15px;font-weight:700;color:var(--tp)}
+.admin-body{padding:18px 20px}
+/* FIELD BUILDER */
+.field-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.field-item{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:grab;transition:border-color .2s}
+.field-item:hover{border-color:var(--c)}
+.field-item.dragging{opacity:.5;border-color:var(--c)}
+.field-item.dragover{border-color:var(--g);background:rgba(34,197,94,.05)}
+.fi-drag{color:var(--tm);font-size:16px;cursor:grab;flex-shrink:0}
+.fi-icon{font-size:18px;flex-shrink:0}
+.fi-info{flex:1}
+.fi-name{font-size:13px;font-weight:700;color:var(--tp)}
+.fi-type{font-size:11px;color:var(--ts)}
+.fi-req{font-size:10px;color:var(--r);margin-right:4px}
+.fi-actions{display:flex;gap:6px;flex-shrink:0}
+.fi-edit{background:rgba(200,230,60,.1);border:1px solid rgba(200,230,60,.25);border-radius:6px;padding:4px 10px;color:var(--c);font-size:11px;cursor:pointer;font-family:var(--f)}
+.fi-del{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:6px;padding:4px 10px;color:var(--r);font-size:11px;cursor:pointer;font-family:var(--f)}
+.fi-toggle{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:4px 10px;color:var(--g);font-size:11px;cursor:pointer;font-family:var(--f)}
+.fi-toggle.off{background:rgba(255,255,255,.05);border-color:var(--b);color:var(--tm)}
+/* ADD FIELD MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:8888;display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modal-box{background:#0d1829;border:1px solid var(--b);border-radius:18px;padding:20px;width:100%;max-width:400px;direction:rtl}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:16px;color:var(--tp)}
+.mf{margin-bottom:13px}
+.mfl{font-size:12px;color:var(--ts);margin-bottom:5px}
+.mfi{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:8px;padding:9px 12px;color:var(--tp);font-size:13px;font-family:var(--f);outline:none}
+.mfi:focus{border-color:var(--c)}
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}
+.type-opt{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:9px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.type-opt:hover{border-color:var(--c)}
+.type-opt.sel{background:rgba(200,230,60,.12);border-color:var(--c)}
+.type-ico{font-size:20px;margin-bottom:4px}
+.type-lbl{font-size:11px;color:var(--ts)}
+.type-opt.sel .type-lbl{color:var(--c)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--b);margin-top:4px}
+.toggle-lbl{font-size:12px;color:var(--ts)}
+.toggle{width:38px;height:20px;background:rgba(255,255,255,.1);border-radius:20px;position:relative;cursor:pointer;transition:background .2s}
+.toggle.on{background:var(--g)}
+.toggle::after{content:'';position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:right .2s}
+.toggle.on::after{right:20px}
+.modal-btns{display:flex;gap:8px;margin-top:14px}
+.modal-save{flex:1;background:linear-gradient(135deg,#c8e63c,#a8c420);border:none;border-radius:9px;padding:11px;color:#1a2a00;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f)}
+.modal-cancel{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:9px;padding:11px;color:var(--ts);font-size:13px;cursor:pointer;font-family:var(--f)}
+/* OPTIONS EDITOR */
+.opts-area{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:8px;padding:9px 12px;color:var(--tp);font-size:12px;font-family:var(--f);min-height:80px;resize:vertical;direction:rtl;outline:none;margin-top:4px}
+/* LOADER */
+.ldr{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltr{direction:ltr}.mt{color:var(--ts)}.vmt{color:var(--tm);font-size:10px}
+/* STEPS PAGES */
+.step-pages{position:relative}
+
+/* ADMIN LOGIN */
+.admin-login{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px}
+.al-box{background:#0d1829;border:1px solid rgba(168,85,247,.3);border-radius:20px;padding:28px 24px;width:100%;max-width:340px;text-align:center}
+.al-box .al-ico{font-size:48px;margin-bottom:12px}
+.al-box h2{font-size:17px;font-weight:800;margin-bottom:6px;color:var(--tp)}
+.al-box p{font-size:12px;color:var(--ts);margin-bottom:20px}
+.al-inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(168,85,247,.3);border-radius:10px;padding:12px 14px;color:var(--tp);font-size:16px;font-family:var(--f);text-align:center;outline:none;letter-spacing:4px}
+.al-inp:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.15)}
+.al-err{color:var(--r);font-size:12px;margin-top:8px;display:none}
+.al-btn{width:100%;margin-top:14px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;border-radius:10px;padding:13px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--f);box-shadow:0 4px 16px rgba(168,85,247,.35)}
+.al-cancel{width:100%;margin-top:8px;background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:10px;padding:11px;color:var(--ts);font-size:13px;cursor:pointer;font-family:var(--f)}
+/* USER MODE - hide admin elements */
+body.user-mode .nb.admin-btn{display:none!important}
+/* ADMIN BADGE */
+.admin-badge{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(124,58,237,.15));border:1px solid rgba(168,85,247,.35);border-radius:20px;padding:3px 12px;font-size:11px;color:#c084fc;display:none}
+.admin-badge.show{display:inline-block}
+.logout-btn{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:5px 10px;color:var(--r);font-size:11px;cursor:pointer;font-family:var(--f);display:none}
+.logout-btn.show{display:inline-block}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="nav-brand">📊 لوحة التحكم</span>
+  <span class="nav-space"></span>
+  <a href="form.html" class="nb" style="text-decoration:none">📝 تسجيل مطعم</a>
+  <span class="admin-badge" id="adminBadge">👑 مدير</span>
+  <button class="logout-btn" id="logoutBtn" onclick="logout()">خروج</button>
+  <button class="nb admin-btn" id="btn-admin" onclick="requireAdmin()">⚙️ إدارة</button>
+</nav>
+
+<!-- DASHBOARD PAGE -->
+<div id="view-dash" class="page">
+  <div class="sg">
+    <div class="sc"><div class="si" style="background:rgba(200,230,60,.15)">🍽️</div><div><div class="slb">إجمالي</div><div class="sv" id="st0" style="color:var(--c)">0</div></div></div>
+    <div class="sc"><div class="si" style="background:rgba(34,197,94,.15)">✅</div><div><div class="slb">نشط</div><div class="sv" id="st1" style="color:var(--g)">0</div></div></div>
+    <div class="sc"><div class="si" style="background:rgba(234,179,8,.15)">⏳</div><div><div class="slb">انتظار</div><div class="sv" id="st2" style="color:var(--y)">0</div></div></div>
+    <div class="sc"><div class="si" style="background:rgba(239,68,68,.15)">⛔</div><div><div class="slb">معلق</div><div class="sv" id="st3" style="color:var(--r)">0</div></div></div>
+  </div>
+  <div class="tb">
+    <input class="si2" id="srch" placeholder="🔍 بحث..." oninput="renderTable()">
+    <button class="fb active" onclick="setFilt('الكل',this)">الكل</button>
+    <button class="fb" onclick="setFilt('جديد',this)">جديد</button>
+    <button class="fb" onclick="setFilt('نشط',this)">نشط</button>
+    <button class="fb" onclick="setFilt('انتظار',this)">انتظار</button>
+    <button class="fb" onclick="setFilt('معلق',this)">معلق</button>
+    <button style="background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:7px;padding:6px 11px;color:var(--ts);font-size:11px;cursor:pointer;font-family:var(--f)" onclick="loadDash()">🔄</button>
+    <span style="color:var(--tm);font-size:11px" id="rCnt">0 نتيجة</span>
+  </div>
+  <div class="tc">
+    <div class="th2">
+      <span style="font-weight:700;font-size:13px;color:var(--tp)">📋 قائمة المطاعم</span>
+      <span style="color:var(--tm);font-size:11px">💾 تخزين مشترك</span>
+    </div>
+    <div id="tBody"><div class="emp">⏳ جاري التحميل...</div></div>
+  </div>
+  <div class="dp" id="detPanel">
+    <div class="dpt">
+      <span class="dptt" id="detTitle">تفاصيل</span>
+      <button class="dpc" onclick="closeDet()">✕</button>
+    </div>
+    <div class="dpg" id="detGrid"></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN PAGE ══ -->
+
+<!-- ADMIN PAGE -->
+<div id="view-admin" class="page">
+  <div class="admin-wrap">
+    <!-- Header -->
+    <div class="admin-card">
+      <div class="admin-head">
+        <span style="font-size:22px">⚙️</span>
+        <div>
+          <h2>إدارة حقول الفورمة</h2>
+          <p style="font-size:11px;color:var(--ts);margin-top:2px">أضف وعدّل واحذف حقول الفورمة بدون تعديل الكود</p>
+        </div>
+      </div>
+      <div class="admin-body">
+        <!-- Current fields -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span style="font-size:13px;font-weight:700;color:var(--tp)">الحقول الحالية</span>
+          <span style="font-size:11px;color:var(--tm)" id="fieldCount">0 حقل</span>
+        </div>
+        <div class="field-list" id="fieldList"></div>
+        <button onclick="openAddModal()" style="width:100%;background:rgba(200,230,60,.08);border:1px dashed rgba(200,230,60,.4);border-radius:11px;padding:13px;color:var(--c);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f);transition:all .2s">
+          + إضافة حقل جديد
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Settings -->
+    <div class="admin-card">
+      <div class="admin-head" style="background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(22,163,74,.08))">
+        <span style="font-size:22px">📝</span>
+        <h2>إعدادات الفورمة</h2>
+      </div>
+      <div class="admin-body">
+        <div class="mf">
+          <div class="mfl">عنوان الفورمة</div>
+          <input class="mfi" id="cfg_title" placeholder="تسجيل مطعم جديد" oninput="saveCfg()">
+        </div>
+        <div class="mf">
+          <div class="mfl">وصف الفورمة</div>
+          <input class="mfi" id="cfg_sub" placeholder="أدخل بيانات المطعم..." oninput="saveCfg()">
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button onclick="previewForm()" style="flex:1;background:rgba(200,230,60,.1);border:1px solid rgba(200,230,60,.3);border-radius:9px;padding:11px;color:var(--c);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f)">👁️ معاينة الفورمة</button>
+          <button onclick="resetToDefault()" style="flex:1;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:9px;padding:11px;color:var(--r);font-size:13px;cursor:pointer;font-family:var(--f)">↺ إعادة تعيين</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="admin-card">
+      <div class="admin-head" style="background:linear-gradient(135deg,rgba(234,179,8,.12),rgba(202,138,4,.08))">
+        <span style="font-size:22px">📊</span>
+        <h2>إحصائيات النظام</h2>
+      </div>
+      <div class="admin-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="adminStats"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ ADD/EDIT FIELD MODAL ══ -->
+<div class="modal" id="fieldModal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">➕ إضافة حقل جديد</div>
+    <input type="hidden" id="editFieldId">
+    <div class="mf">
+      <div class="mfl">اسم الحقل (يظهر في الفورمة)</div>
+      <input class="mfi" id="mf_name" placeholder="مثال: رقم الهاتف، اسم المدير...">
+    </div>
+    <div class="mf">
+      <div class="mfl">نوع الحقل</div>
+      <div class="type-grid" id="typeGrid">
+        <div class="type-opt sel" onclick="selType('text',this)"><div class="type-ico">✏️</div><div class="type-lbl">نص عادي</div></div>
+        <div class="type-opt" onclick="selType('phone',this)"><div class="type-ico">📞</div><div class="type-lbl">هاتف</div></div>
+        <div class="type-opt" onclick="selType('date',this)"><div class="type-ico">📅</div><div class="type-lbl">تاريخ</div></div>
+        <div class="type-opt" onclick="selType('dropdown',this)"><div class="type-ico">📋</div><div class="type-lbl">قائمة</div></div>
+        <div class="type-opt" onclick="selType('photo',this)"><div class="type-ico">📸</div><div class="type-lbl">صورة</div></div>
+        <div class="type-opt" onclick="selType('barcode',this)"><div class="type-ico">📷</div><div class="type-lbl">باركود</div></div>
+        <div class="type-opt" onclick="selType('textarea',this)"><div class="type-ico">📄</div><div class="type-lbl">نص طويل</div></div>
+        <div class="type-opt" onclick="selType('number',this)"><div class="type-ico">🔢</div><div class="type-lbl">رقم</div></div>
+        <div class="type-opt" onclick="selType('email',this)"><div class="type-ico">✉️</div><div class="type-lbl">بريد</div></div>
+      </div>
+    </div>
+    <div class="mf" id="optsWrap" style="display:none">
+      <div class="mfl">خيارات القائمة (كل خيار في سطر)</div>
+      <textarea class="opts-area" id="mf_opts" placeholder="خيار 1&#10;خيار 2&#10;خيار 3"></textarea>
+    </div>
+    <div class="mf" id="phWrap" style="display:none">
+      <div class="mfl">نص placeholder</div>
+      <input class="mfi" id="mf_ph" placeholder="مثال: أدخل الرقم...">
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-lbl">حقل إلزامي (مطلوب)</span>
+      <div class="toggle" id="reqToggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-save" onclick="saveField()">💾 حفظ</button>
+      <button class="modal-cancel" onclick="closeModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ ADMIN LOGIN MODAL ══ -->
+<div class="admin-login" id="adminLogin" style="display:none">
+  <div class="al-box">
+    <div class="al-ico">🔐</div>
+    <h2>دخول المدير</h2>
+    <p>أدخل كلمة مرور المدير للوصول إلى لوحة الإدارة</p>
+    <input class="al-inp" id="adminPass" type="password" placeholder="••••••••" maxlength="20"
+      onkeydown="if(event.key==='Enter')checkPass()">
+    <div class="al-err" id="passErr">❌ كلمة المرور غير صحيحة</div>
+    <button class="al-btn" onclick="checkPass()">🔓 دخول</button>
+    <button class="al-cancel" onclick="closeAdminLogin()">إلغاء</button>
+  </div>
+</div>
+
+<!-- ══ SCANNER ══ -->
+
+<!-- ADMIN LOGIN -->
+<div class="admin-login" id="adminLogin" style="display:none">
+  <div class="al-box">
+    <div class="al-ico">🔐</div>
+    <h2>دخول المدير</h2>
+    <p>أدخل كلمة مرور المدير للوصول إلى لوحة الإدارة</p>
+    <input class="al-inp" id="adminPass" type="password" placeholder="••••••••" maxlength="20"
+      onkeydown="if(event.key==='Enter')checkPass()">
+    <div class="al-err" id="passErr">❌ كلمة المرور غير صحيحة</div>
+    <button class="al-btn" onclick="checkPass()">🔓 دخول</button>
+    <button class="al-cancel" onclick="closeAdminLogin()">إلغاء</button>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuVTLi49zVHeIl4Itc4I-G0kN33-tC-5G7c5wB8hXLBH9jqc6NhHJuZci0E3kzPI8LZg/exec";
+const DB_KEY = "resto-v3";
+const CFG_KEY = "resto-cfg-v3";
+
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuVTLi49zVHeIl4Itc4I-G0kN33-tC-5G7c5wB8hXLBH9jqc6NhHJuZci0E3kzPI8LZg/exec";
+const DB_KEY = "resto-v3";
+const CFG_KEY = "resto-cfg-v3";
+
+// ══ DEFAULT FIELDS ══
+const DEFAULT_FIELDS = [
+  {id:"f1", name:"اسم المطعم", type:"text", required:true, ph:"مثال: مطعم النخبة", enabled:true},
+  {id:"f2", name:"اسم الموظف المسؤول", type:"text", required:true, ph:"مثال: أحمد محمد", enabled:true},
+  {id:"f3", name:"العنوان", type:"text", required:true, ph:"المحافظة، المنطقة، الشارع", enabled:true},
+  {id:"f4", name:"رقم جهاز POS", type:"barcode", required:true, ph:"أدخل يدوياً أو امسح الباركود", enabled:true},
+  {id:"f5", name:"رقم SIM كارت POS", type:"barcode", required:true, ph:"أدخل يدوياً أو امسح الباركود", enabled:true},
+  {id:"f6", name:"صورة المطعم", type:"photo", required:false, ph:"", enabled:true},
+  {id:"f7", name:"ملاحظات", type:"textarea", required:false, ph:"أي معلومات إضافية...", enabled:true},
+];
+
+const DEFAULT_CFG = { title:"تسجيل مطعم جديد", subtitle:"أدخل بيانات المطعم لإضافته إلى النظام" };
+
+// ══ STATE ══
+let fields = [];
+let cfg = {...DEFAULT_CFG};
+let formData = {};
+let photos = {};
+let currentType = "text";
+let editId = null;
+let scanField = "";
+let scanStream = null;
+let scanFrame = null;
+let scanValue = "";
+let currentFilt = "الكل";
+let selectedId = null;
+let allRows = [];
+let dragSrc = null;
+
+// ══ INIT ══
+window.onload = () => {
+  loadCfg();
+  renderAdmin();
+  renderDynamicForm();
+  loadDash();
+};
+
+// ══ CONFIG ══
+function loadCfg() {
+  try {
+    const saved = localStorage.getItem(CFG_KEY);
+    if (saved) {
+      const s = JSON.parse(saved);
+      fields = s.fields || DEFAULT_FIELDS;
+      cfg = s.cfg || DEFAULT_CFG;
+    } else {
+      fields = JSON.parse(JSON.stringify(DEFAULT_FIELDS));
+      cfg = {...DEFAULT_CFG};
+    }
+  } catch { fields = JSON.parse(JSON.stringify(DEFAULT_FIELDS)); cfg = {...DEFAULT_CFG}; }
+}
+
+function saveCfgData() {
+  cfg.title = document.getElementById("cfg_title").value || DEFAULT_CFG.title;
+  cfg.subtitle = document.getElementById("cfg_sub").value || DEFAULT_CFG.subtitle;
+  localStorage.setItem(CFG_KEY, JSON.stringify({fields, cfg}));
+  renderDynamicForm();
+}
+function saveCfg() { saveCfgData(); }
+
+function saveFields() {
+  localStorage.setItem(CFG_KEY, JSON.stringify({fields, cfg}));
+}
+
+// ══ NAV ══
+function showView(v) {
+  ["form","dash","admin"].forEach(id => {
+    document.getElementById("view-"+id).classList.toggle("show", id===v);
+    document.getElementById("btn-"+id).classList.toggle("active", id===v);
+  });
+  if (v==="dash") loadDash();
+  if (v==="admin") renderAdmin();
+  if (v==="form") renderDynamicForm();
+}
+
+// ══ DYNAMIC FORM ══
+function renderDynamicForm() {
+  // Update title/subtitle
+  document.getElementById("formTitle").textContent = cfg.title;
+  document.getElementById("formSubtitle").textContent = cfg.subtitle;
+  const enabledFields = fields.filter(f => f.enabled);
+  const container = document.getElementById("dynamicFields");
+  container.innerHTML = "";
+  formData = {};
+  photos = {};
+  enabledFields.forEach(f => {
+    const div = document.createElement("div");
+    div.className = "field";
+    div.id = "fw_" + f.id;
+    const lbl = `<div class="fl">${f.required?'<span class="req">*</span>':''} ${f.name} ${typeIcon(f.type)}</div>`;
+    const errDiv = `<div class="fe" id="fe_${f.id}">⚠️ هذا الحقل مطلوب</div>`;
+    let input = "";
+    if (f.type === "text" || f.type === "number" || f.type === "email") {
+      input = `<input class="fi" id="fv_${f.id}" type="${f.type==="text"?"text":f.type}" placeholder="${f.ph||""}" oninput="setFD('${f.id}',this.value);clearFE('${f.id}')">`;
+    } else if (f.type === "phone") {
+      input = `<input class="fi" id="fv_${f.id}" type="tel" placeholder="${f.ph||"07xxxxxxxxx"}" dir="ltr" oninput="setFD('${f.id}',this.value);clearFE('${f.id}')">`;
+    } else if (f.type === "date") {
+      input = `<input class="fi" id="fv_${f.id}" type="date" dir="ltr" oninput="setFD('${f.id}',this.value);clearFE('${f.id}')">`;
+    } else if (f.type === "textarea") {
+      input = `<textarea class="ft" id="fv_${f.id}" placeholder="${f.ph||""}" oninput="setFD('${f.id}',this.value)"></textarea>`;
+    } else if (f.type === "dropdown") {
+      const opts = (f.options||[]).map(o => `<option>${o}</option>`).join("");
+      input = `<select class="fs" id="fv_${f.id}" onchange="setFD('${f.id}',this.value);clearFE('${f.id}')"><option value="">-- اختر --</option>${opts}</select>`;
+    } else if (f.type === "barcode") {
+      input = `<div class="pr"><input class="fi" id="fv_${f.id}" type="text" placeholder="${f.ph||"أدخل يدوياً أو امسح"}" dir="ltr" oninput="setFD('${f.id}',this.value);clearFE('${f.id}')"><button class="sb" onclick="openScan('${f.id}','${f.name}')" title="مسح باركود"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="17" y="2" width="5" height="5" rx="1"/><rect x="2" y="17" width="5" height="5" rx="1"/><line x1="9" y1="3.5" x2="9" y2="8.5"/><line x1="12" y1="3.5" x2="12" y2="8.5"/><line x1="17" y1="9" x2="22" y2="9"/><line x1="9" y1="12" x2="9" y2="22"/><line x1="12" y1="12" x2="15" y2="12"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="15" y1="18" x2="22" y2="18"/></svg></button></div>`;
+    } else if (f.type === "photo") {
+      input = `<div class="pb"><input type="file" id="fv_${f.id}" accept="image/*" capture="environment" onchange="handlePhoto('${f.id}',this)"><div style="font-size:26px;margin-bottom:5px">📷</div><div class="photoTxt" id="pt_${f.id}" style="color:var(--ts);font-size:12px">اضغط لالتقاط صورة</div></div><img id="pp_${f.id}" class="pp" alt="preview">`;
+    }
+    div.innerHTML = lbl + input + errDiv;
+    container.appendChild(div);
+  });
+}
+
+function setFD(id, val) { formData[id] = val; }
+function clearFE(id) { document.getElementById("fe_"+id).style.display = "none"; const el = document.getElementById("fv_"+id); if(el) el.classList.remove("err"); }
+function typeIcon(t) { return {text:"✏️",phone:"📞",date:"📅",dropdown:"📋",photo:"📸",barcode:"📷",textarea:"📄",number:"🔢",email:"✉️"}[t]||"📝"; }
+
+function handlePhoto(fid, input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    photos[fid] = e.target.result;
+    formData[fid] = "✅ صورة مرفقة";
+    document.getElementById("pp_"+fid).src = e.target.result;
+    document.getElementById("pp_"+fid).style.display = "block";
+    document.getElementById("pt_"+fid).textContent = "✅ " + file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══ FORM NAVIGATION ══
+function next1() {
+  let ok = true;
+  fields.filter(f=>f.enabled).forEach(f => {
+    if (f.required && !formData[f.id] && f.type !== "photo") {
+      document.getElementById("fe_"+f.id).style.display = "block";
+      const el = document.getElementById("fv_"+f.id); if(el) el.classList.add("err");
+      ok = false;
+    }
+  });
+  if (ok) { buildReview(); showPg(2); }
+}
+
+function showPg(n) {
+  document.getElementById("pg1").style.display = n===1?"block":"none";
+  document.getElementById("pg2").style.display = n===2?"block":"none";
+  document.getElementById("pgOK").style.display = n===3?"block":"none";
+  // Update steps
+  if(n===1){setSN(1,"active");setSN(2,"idle");document.getElementById("ln1").className="sline";}
+  if(n===2){setSN(1,"done");setSN(2,"active");document.getElementById("ln1").className="sline done";}
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function setSN(n,st) {
+  const el=document.getElementById("sn"+n),sl=document.getElementById("sl"+n);
+  el.className="sn "+st; sl.className="sl "+st;
+  el.textContent = st==="done"?"✓":n;
+}
+
+function buildReview() {
+  const enabledFields = fields.filter(f => f.enabled);
+  let html = `<div class="rb"><div class="rt">📋 البيانات المُدخلة</div>`;
+  enabledFields.forEach(f => {
+    const val = formData[f.id] || "—";
+    if (f.type === "photo" && photos[f.id]) {
+      html += `<div class="rr"><span class="rk">${f.name}</span><span class="rv">✅ صورة مرفقة</span></div>`;
+      html += `<img src="${photos[f.id]}" style="width:100%;border-radius:8px;margin:6px 0;max-height:120px;object-fit:cover">`;
+    } else {
+      html += `<div class="rr"><span class="rk">${f.name}</span><span class="rv">${val}</span></div>`;
+    }
+  });
+  html += "</div>";
+  document.getElementById("reviewArea").innerHTML = html;
+}
+
+function clearForm() {
+  formData = {}; photos = {};
+  renderDynamicForm();
+}
+
+// ══ SUBMIT ══
+async function submitForm() {
+  const btn = document.getElementById("sendBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ldr"></span> جاري الإرسال...';
+  const record = {
+    id: "R-" + Date.now(),
+    submittedAt: new Date().toLocaleString("ar-IQ"),
+    status: "جديد",
+    ...formData,
+  };
+  const photoKeys = {};
+  Object.keys(photos).forEach(k => photoKeys[k] = photos[k]);
+  const existing = dbLoad();
+  existing.push({...record, photos: photoKeys});
+  dbSave(existing);
+  let ok = false;
+  try {
+    const sheetData = {};
+    fields.filter(f=>f.enabled).forEach(f => { sheetData[f.name] = formData[f.id] || ""; });
+    const mappedData = {
+      id: record.id,
+      submittedAt: record.submittedAt,
+      status: record.status,
+      restaurantName: sheetData["اسم المطعم"] || "",
+      managerName: sheetData["اسم الموظف المسؤول"] || "",
+      address: sheetData["العنوان"] || "",
+      posDevice: sheetData["رقم جهاز POS"] || "",
+      simCard: sheetData["رقم SIM كارت POS"] || "",
+      notes: sheetData["ملاحظات"] || "",
+      ...sheetData
+    };
+    await fetch(SCRIPT_URL, {method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"addRow",data:mappedData})});
+    ok = true;
+  } catch {}
+  showPg(3);
+  document.getElementById("regId").textContent = "🔖 رقم التسجيل: " + record.id;
+  const st = document.getElementById("shSt");
+  st.className = ok ? "sst sok" : "sst slc";
+  st.textContent = ok ? "✅ تم الإرسال إلى Google Sheets" : "💾 تم الحفظ في النظام";
+}
+
+function resetForm() {
+  formData = {}; photos = {};
+  document.getElementById("sendBtn").disabled = false;
+  document.getElementById("sendBtn").textContent = "✅ إرسال وتسجيل";
+  renderDynamicForm();
+  showPg(1);
+}
+
+// ══ DB ══
+function dbLoad() { try { return JSON.parse(localStorage.getItem(DB_KEY)||"[]"); } catch { return []; } }
+function dbSave(d) { try { localStorage.setItem(DB_KEY, JSON.stringify(d)); } catch {} }
+
+// ══ SCANNER ══
+async function openScan(fid, label) {
+  scanField = fid; scanValue = "";
+  document.getElementById("scanTitle").textContent = "📷 مسح: " + label;
+  document.getElementById("scanRes").style.display = "none";
+  document.getElementById("scanOk").style.display = "none";
+  document.getElementById("scanSt").textContent = "جاري تشغيل الكاميرا...";
+  document.getElementById("scanWrap").classList.add("open");
+  const video = document.getElementById("scanVid");
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}});
+    video.srcObject = scanStream;
+    await video.play();
+    document.getElementById("scanSt").textContent = "وجّه الكاميرا نحو الباركود...";
+    startScan(video);
+  } catch {
+    document.getElementById("scanSt").textContent = "❌ لا يمكن فتح الكاميرا";
+  }
+}
+
+function startScan(video) {
+  if (!("BarcodeDetector" in window)) { document.getElementById("scanSt").textContent = "⚠️ أدخل يدوياً — المتصفح لا يدعم المسح"; return; }
+  const det = new BarcodeDetector({formats:["qr_code","code_128","code_39","ean_13","ean_8","upc_a","upc_e","itf","codabar","data_matrix"]});
+  const loop = async () => {
+    if (!scanStream) return;
+    try {
+      const res = await det.detect(video);
+      if (res.length > 0) {
+        scanValue = res[0].rawValue;
+        document.getElementById("scanRes").textContent = "✅ تم: " + scanValue;
+        document.getElementById("scanRes").style.display = "block";
+        document.getElementById("scanOk").style.display = "block";
+        document.getElementById("scanSt").textContent = "✅ تم قراءة الباركود!";
+        return;
+      }
+    } catch {}
+    scanFrame = requestAnimationFrame(loop);
+  };
+  scanFrame = requestAnimationFrame(loop);
+}
+
+function confirmScan() {
+  if (scanValue && scanField) {
+    const el = document.getElementById("fv_"+scanField);
+    if (el) { el.value = scanValue; setFD(scanField, scanValue); clearFE(scanField); }
+  }
+  closeScan();
+}
+
+function closeScan() {
+  if (scanFrame) { cancelAnimationFrame(scanFrame); scanFrame = null; }
+  if (scanStream) { scanStream.getTracks().forEach(t=>t.stop()); scanStream = null; }
+  document.getElementById("scanVid").srcObject = null;
+  document.getElementById("scanWrap").classList.remove("open");
+}
+
+// ══ DASHBOARD ══
+async function loadDash() {
+  allRows = dbLoad();
+  updateStats();
+  renderTable();
+  // Try to fetch from Google Sheets too
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getRows&t=" + Date.now());
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      // Merge: sheet data wins for status, local data wins for photos
+      const localMap = {};
+      allRows.forEach(r => localMap[r.id] = r);
+      const merged = data.map(r => ({ ...r, ...(localMap[r.id] ? { photos: localMap[r.id].photos } : {}) }));
+      // Also keep local-only rows not yet in sheet
+      const sheetIds = new Set(data.map(r => r.id));
+      allRows.forEach(r => { if (!sheetIds.has(r.id)) merged.push(r); });
+      allRows = merged;
+      dbSave(allRows);
+      updateStats();
+      renderTable();
+    }
+  } catch(e) { /* offline or sheet not configured */ }
+}
+
+function updateStats() {
+  document.getElementById("st0").textContent = allRows.length;
+  document.getElementById("st1").textContent = allRows.filter(r=>r.status==="نشط").length;
+  document.getElementById("st2").textContent = allRows.filter(r=>["انتظار","جديد"].includes(r.status)).length;
+  document.getElementById("st3").textContent = allRows.filter(r=>r.status==="معلق").length;
+}
+
+function setFilt(val, btn) {
+  currentFilt = val;
+  document.querySelectorAll(".fb").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderTable();
+}
+
+function bc(st) { return {نشط:"bdg ba",انتظار:"bdg bw",معلق:"bdg bsu",جديد:"bdg bn2"}[st]||"bdg bn2"; }
+
+function renderTable() {
+  const q = document.getElementById("srch").value.toLowerCase();
+  const filtered = allRows.filter(r => {
+    const vals = Object.values(r).join(" ").toLowerCase();
+    return (!q || vals.includes(q)) && (currentFilt==="الكل"||r.status===currentFilt);
+  });
+  document.getElementById("rCnt").textContent = filtered.length + " نتيجة";
+  if (!filtered.length) {
+    document.getElementById("tBody").innerHTML = `<div class="emp"><div style="font-size:36px;margin-bottom:8px">🍽️</div><div style="font-weight:700">لا توجد سجلات</div></div>`;
+    return;
+  }
+  // Get first text field name for display
+  const nameField = fields.find(f=>f.enabled && f.type==="text");
+  const nameKey = nameField ? nameField.id : null;
+  let html = `<div class="tw"><table><thead><tr><th>#</th><th>الاسم</th><th>التاريخ</th><th>الحالة</th><th>تعديل</th></tr></thead><tbody>`;
+  filtered.forEach((row, i) => {
+    const name = (nameKey && row[nameKey]) || row.restaurantName || "—";
+    html += `<tr class="${selectedId===row.id?"sel":""}" onclick="selRow('${row.id}')">
+      <td class="vmt">${i+1}</td>
+      <td><div class="rc"><div class="ra">${name[0]||"م"}</div><div><div class="rn">${name}</div><div class="ri">${row.id}</div></div></div></td>
+      <td class="vmt" style="white-space:nowrap">${row.submittedAt||""}</td>
+      <td><span class="${bc(row.status)}">${row.status||"جديد"}</span></td>
+      <td><div class="ab">
+        <button class="at ${row.status==="نشط"?"cur":""}" onclick="event.stopPropagation();chSt('${row.id}','نشط')">نشط</button>
+        <button class="at ${row.status==="انتظار"?"cur":""}" onclick="event.stopPropagation();chSt('${row.id}','انتظار')">انتظار</button>
+        <button class="at ${row.status==="معلق"?"cur":""}" onclick="event.stopPropagation();chSt('${row.id}','معلق')">معلق</button>
+        <button class="dt" onclick="event.stopPropagation();delRow('${row.id}')">🗑️</button>
+      </div></td>
+    </tr>`;
+  });
+  html += "</tbody></table></div>";
+  document.getElementById("tBody").innerHTML = html;
+}
+
+function chSt(id, st) {
+  allRows = allRows.map(r=>r.id===id?{...r,status:st}:r);
+  dbSave(allRows); updateStats(); renderTable();
+  if(selectedId===id) showDet(allRows.find(r=>r.id===id));
+  try { fetch(SCRIPT_URL, {method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"updateStatus",data:{id,status:st}})}); } catch(e){}
+}
+
+function delRow(id) {
+  if(!confirm("حذف هذا السجل؟")) return;
+  allRows = allRows.filter(r=>r.id!==id);
+  dbSave(allRows); updateStats(); renderTable();
+  if(selectedId===id) closeDet();
+}
+
+function selRow(id) {
+  if(selectedId===id){closeDet();return;}
+  selectedId=id; renderTable();
+  showDet(allRows.find(r=>r.id===id));
+}
+
+function showDet(row) {
+  if(!row) return;
+  const nameField = fields.find(f=>f.enabled&&f.type==="text");
+  const name = (nameField&&row[nameField.id])||row.restaurantName||row.id;
+  document.getElementById("detTitle").textContent = "📋 " + name;
+  let html = `<div class="dpb"><div class="dpbt">📋 البيانات المُدخلة</div>`;
+  fields.filter(f=>f.enabled).forEach(f => {
+    const val = row[f.id] || "—";
+    if (f.type==="photo" && row.photos && row.photos[f.id]) {
+      html += `<div class="dpr"><span class="dpk">${f.name}</span><span class="dpv">✅ صورة</span></div>`;
+      html += `<img src="${row.photos[f.id]}" style="width:100%;border-radius:8px;margin-top:5px;max-height:110px;object-fit:cover">`;
+    } else {
+      html += `<div class="dpr"><span class="dpk">${f.name}</span><span class="dpv">${val}</span></div>`;
+    }
+  });
+  html += `<div class="dpr" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--b)"><span class="dpk">التسجيل</span><span class="dpv">${row.submittedAt||""}</span></div>`;
+  html += "</div>";
+  document.getElementById("detGrid").innerHTML = html;
+  document.getElementById("detPanel").style.display = "block";
+  document.getElementById("detPanel").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function closeDet() {
+  selectedId=null;
+  document.getElementById("detPanel").style.display="none";
+  renderTable();
+}
+
+// ══ ADMIN ══
+function renderAdmin() {
+  document.getElementById("cfg_title").value = cfg.title||"";
+  document.getElementById("cfg_sub").value = cfg.subtitle||"";
+  document.getElementById("fieldCount").textContent = fields.filter(f=>f.enabled).length + " حقل مفعّل من " + fields.length;
+
+  const list = document.getElementById("fieldList");
+  list.innerHTML = "";
+  fields.forEach((f, idx) => {
+    const div = document.createElement("div");
+    div.className = "field-item";
+    div.draggable = true;
+    div.dataset.idx = idx;
+    div.innerHTML = `
+      <span class="fi-drag">⋮⋮</span>
+      <span class="fi-icon">${typeIcon(f.type)}</span>
+      <div class="fi-info">
+        <div class="fi-name">${f.required?'<span class="fi-req">*</span>':''}${f.name}</div>
+        <div class="fi-type">${typeLabel(f.type)}</div>
+      </div>
+      <div class="fi-actions">
+        <button class="fi-toggle ${f.enabled?"":"off"}" onclick="toggleField('${f.id}')">${f.enabled?"مفعّل":"معطّل"}</button>
+        <button class="fi-edit" onclick="openEditModal('${f.id}')">✏️ تعديل</button>
+        <button class="fi-del" onclick="deleteField('${f.id}')">🗑️</button>
+      </div>`;
+    // Drag events
+    div.addEventListener("dragstart", e => { dragSrc = idx; div.classList.add("dragging"); });
+    div.addEventListener("dragend", () => div.classList.remove("dragging"));
+    div.addEventListener("dragover", e => { e.preventDefault(); div.classList.add("dragover"); });
+    div.addEventListener("dragleave", () => div.classList.remove("dragover"));
+    div.addEventListener("drop", e => {
+      e.preventDefault(); div.classList.remove("dragover");
+      if (dragSrc !== null && dragSrc !== idx) {
+        const moved = fields.splice(dragSrc, 1)[0];
+        fields.splice(idx, 0, moved);
+        saveFields(); renderAdmin(); renderDynamicForm();
+      }
+    });
+    list.appendChild(div);
+  });
+
+  // Admin stats
+  const rows = dbLoad();
+  document.getElementById("adminStats").innerHTML = `
+    <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:var(--c)">${rows.length}</div>
+      <div style="font-size:11px;color:var(--ts)">إجمالي السجلات</div>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:var(--g)">${fields.filter(f=>f.enabled).length}</div>
+      <div style="font-size:11px;color:var(--ts)">حقول مفعّلة</div>
+    </div>`;
+}
+
+function typeLabel(t) { return {text:"نص عادي",phone:"رقم هاتف",date:"تاريخ",dropdown:"قائمة اختيار",photo:"صورة",barcode:"باركود",textarea:"نص طويل",number:"رقم",email:"بريد إلكتروني"}[t]||t; }
+
+function toggleField(id) {
+  const f = fields.find(x=>x.id===id);
+  if (f) { f.enabled = !f.enabled; saveFields(); renderAdmin(); renderDynamicForm(); }
+}
+
+function deleteField(id) {
+  if (!confirm("حذف هذا الحقل نهائياً؟")) return;
+  fields = fields.filter(f=>f.id!==id);
+  saveFields(); renderAdmin(); renderDynamicForm();
+}
+
+// ══ MODAL ══
+function openAddModal() {
+  editId = null;
+  document.getElementById("modalTitle").textContent = "➕ إضافة حقل جديد";
+  document.getElementById("mf_name").value = "";
+  document.getElementById("mf_ph").value = "";
+  document.getElementById("mf_opts").value = "";
+  document.getElementById("reqToggle").classList.remove("on");
+  selType("text", document.querySelector(".type-opt"));
+  document.getElementById("optsWrap").style.display = "none";
+  document.getElementById("phWrap").style.display = "block";
+  document.getElementById("fieldModal").classList.add("open");
+}
+
+function openEditModal(id) {
+  const f = fields.find(x=>x.id===id);
+  if (!f) return;
+  editId = id;
+  document.getElementById("modalTitle").textContent = "✏️ تعديل الحقل";
+  document.getElementById("mf_name").value = f.name;
+  document.getElementById("mf_ph").value = f.ph||"";
+  document.getElementById("mf_opts").value = (f.options||[]).join("\n");
+  if (f.required) document.getElementById("reqToggle").classList.add("on");
+  else document.getElementById("reqToggle").classList.remove("on");
+  currentType = f.type;
+  document.querySelectorAll(".type-opt").forEach(el => {
+    el.classList.toggle("sel", el.getAttribute("onclick").includes("'"+f.type+"'"));
+  });
+  document.getElementById("optsWrap").style.display = f.type==="dropdown"?"block":"none";
+  document.getElementById("phWrap").style.display = ["photo"].includes(f.type)?"none":"block";
+  document.getElementById("fieldModal").classList.add("open");
+}
+
+function closeModal() { document.getElementById("fieldModal").classList.remove("open"); }
+
+function selType(type, el) {
+  currentType = type;
+  document.querySelectorAll(".type-opt").forEach(o => o.classList.remove("sel"));
+  if (el) el.classList.add("sel");
+  document.getElementById("optsWrap").style.display = type==="dropdown"?"block":"none";
+  document.getElementById("phWrap").style.display = ["photo"].includes(type)?"none":"block";
+}
+
+function saveField() {
+  const name = document.getElementById("mf_name").value.trim();
+  if (!name) { alert("أدخل اسم الحقل"); return; }
+  const required = document.getElementById("reqToggle").classList.contains("on");
+  const ph = document.getElementById("mf_ph").value.trim();
+  const opts = document.getElementById("mf_opts").value.trim().split("\n").filter(x=>x.trim());
+  if (editId) {
+    const f = fields.find(x=>x.id===editId);
+    if (f) { f.name=name; f.type=currentType; f.required=required; f.ph=ph; if(opts.length) f.options=opts; }
+  } else {
+    fields.push({ id:"f"+Date.now(), name, type:currentType, required, ph, options:opts, enabled:true });
+  }
+  saveFields(); renderAdmin(); renderDynamicForm(); closeModal();
+}
+
+function previewForm() { showView("form"); }
+
+function resetToDefault() {
+  if (!confirm("إعادة تعيين الحقول للإعدادات الافتراضية؟")) return;
+  fields = JSON.parse(JSON.stringify(DEFAULT_FIELDS));
+  cfg = {...DEFAULT_CFG};
+  saveFields();
+  document.getElementById("cfg_title").value = cfg.title;
+  document.getElementById("cfg_sub").value = cfg.subtitle;
+  renderAdmin(); renderDynamicForm();
+}
+
+// ══ ADMIN AUTH ══
+const ADMIN_PASS = "4545695";
+let isAdmin = false;
+
+function requireAdmin() {
+  if (isAdmin) { showView('admin'); return; }
+  document.getElementById("adminPass").value = "";
+  document.getElementById("passErr").style.display = "none";
+  document.getElementById("adminLogin").style.display = "flex";
+  setTimeout(() => document.getElementById("adminPass").focus(), 100);
+}
+
+function checkPass() {
+  const pass = document.getElementById("adminPass").value;
+  if (pass === ADMIN_PASS) {
+    isAdmin = true;
+    document.getElementById("adminLogin").style.display = "none";
+    document.getElementById("adminBadge").classList.add("show");
+    document.getElementById("logoutBtn").classList.add("show");
+    document.getElementById("btn-admin").classList.remove("admin-btn");
+    document.getElementById("btn-admin").style.background = "linear-gradient(135deg,#a855f7,#7c3aed)";
+    document.getElementById("btn-admin").style.borderColor = "#a855f7";
+    document.getElementById("btn-admin").style.color = "#fff";
+    showView('admin');
+  } else {
+    document.getElementById("passErr").style.display = "block";
+    document.getElementById("adminPass").value = "";
+    document.getElementById("adminPass").focus();
+    // Shake effect
+    const box = document.querySelector(".al-box");
+    box.style.animation = "none";
+    box.style.transform = "translateX(-8px)";
+    setTimeout(() => box.style.transform = "translateX(8px)", 80);
+    setTimeout(() => box.style.transform = "translateX(-5px)", 160);
+    setTimeout(() => box.style.transform = "translateX(0)", 240);
+  }
+}
+
+function closeAdminLogin() {
+  document.getElementById("adminLogin").style.display = "none";
+}
+
+function logout() {
+  isAdmin = false;
+  document.getElementById("adminBadge").classList.remove("show");
+  document.getElementById("logoutBtn").classList.remove("show");
+  document.getElementById("btn-admin").style.background = "";
+  document.getElementById("btn-admin").style.borderColor = "";
+  document.getElementById("btn-admin").style.color = "";
+  document.getElementById("btn-admin").classList.add("admin-btn");
+  showView('form');
+}
+
+// Block direct access to admin view
+const _origShowView = showView;
+window.showView = function(v) {
+  if (v === 'admin' && !isAdmin) { requireAdmin(); return; }
+  _origShowView(v);
+};
+
+
+
+// Override showView for dashboard-only mode
+window.showView = function(v) {
+  if (v === 'form') { window.location = 'form.html'; return; }
+  if (v === 'admin' && !isAdmin) { requireAdmin(); return; }
+  ["dash","admin"].forEach(id => {
+    const p = document.getElementById("view-"+id);
+    if (p) p.classList.toggle("show", id===v);
+    const b = document.getElementById("btn-"+id);
+    if (b) b.classList.toggle("active", id===v);
+  });
+  if (v==="dash") loadDash();
+  if (v==="admin") renderAdmin();
+};
+
+// Init dashboard
+window.onload = function() {
+  loadCfg();
+  loadDash();
+};
+</script>
+</body>
+</html>
