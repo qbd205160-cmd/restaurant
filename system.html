@@ -455,7 +455,7 @@ body.user-mode .nb.admin-btn{display:none!important}
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzEOTNi8FA-EtGkwp8tfRD_fOq_y97Qn5_q4hejQJiCHb9sZmvn2m54ikFFgocWllTqA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxuVTLi49zVHeIl4Itc4I-G0kN33-tC-5G7c5wB8hXLBH9jqc6NhHJuZci0E3kzPI8LZg/exec";
 const DB_KEY = "resto-v3";
 const CFG_KEY = "resto-cfg-v3";
 
@@ -658,7 +658,19 @@ async function submitForm() {
   try {
     const sheetData = {};
     fields.filter(f=>f.enabled).forEach(f => { sheetData[f.name] = formData[f.id] || ""; });
-    await fetch(SCRIPT_URL, {method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"addRow",data:{...record,...sheetData}})});
+    const mappedData = {
+      id: record.id,
+      submittedAt: record.submittedAt,
+      status: record.status,
+      restaurantName: sheetData["اسم المطعم"] || "",
+      managerName: sheetData["اسم الموظف المسؤول"] || "",
+      address: sheetData["العنوان"] || "",
+      posDevice: sheetData["رقم جهاز POS"] || "",
+      simCard: sheetData["رقم SIM كارت POS"] || "",
+      notes: sheetData["ملاحظات"] || "",
+      ...sheetData
+    };
+    await fetch(SCRIPT_URL, {method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"addRow",data:mappedData})});
     ok = true;
   } catch {}
   showPg(3);
