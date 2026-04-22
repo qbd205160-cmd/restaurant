@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>لوحة التحكم — نظام المطاعم</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#041a1a;--bg2:#062020;--card:rgba(4,26,26,0.97);
+  --b:rgba(200,230,60,0.18);--c:#c8e63c;--cD:#a8c420;
+  --g:#22c55e;--r:#ef4444;--y:#eab308;--pu:#a855f7;
+  --tp:#f0fff4;--ts:rgba(180,230,180,0.65);--tm:rgba(100,180,120,0.38);
+  --f:'Noto Kufi Arabic',sans-serif;
+}
+body{font-family:var(--f);background:linear-gradient(160deg,var(--bg),var(--bg2));min-height:100vh;color:var(--tp)}
+
+/* LOGIN */
+.login-page{position:fixed;inset:0;background:linear-gradient(160deg,var(--bg),var(--bg2));display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999}
+.login-box{background:rgba(4,26,26,0.98);border:1px solid var(--b);border-radius:24px;padding:36px 28px;width:100%;max-width:380px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.login-logo{font-size:52px;margin-bottom:8px}
+.login-box h2{font-size:20px;font-weight:800;margin-bottom:4px}
+.login-box p{font-size:12px;color:var(--ts);margin-bottom:24px}
+.login-field{margin-bottom:14px;text-align:right}
+.login-field label{font-size:11px;color:var(--ts);margin-bottom:5px;display:block}
+.login-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:10px;padding:12px 14px;color:var(--tp);font-size:13px;font-family:var(--f);outline:none;direction:ltr;text-align:left;transition:border .2s}
+.login-input:focus{border-color:var(--c);box-shadow:0 0 0 3px rgba(200,230,60,.1)}
+.login-btn{width:100%;margin-top:6px;background:linear-gradient(135deg,#c8e63c,#a8c420);border:none;border-radius:10px;padding:13px;color:#1a2a00;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--f)}
+.login-err{color:var(--r);font-size:12px;margin-top:10px;display:none;background:rgba(239,68,68,.1);border-radius:8px;padding:8px 12px;border:1px solid rgba(239,68,68,.25)}
+
+/* APP */
+.app{display:none}
+.app.show{display:block}
+
+/* NAV */
+.nav{background:rgba(3,18,18,.98);border-bottom:1px solid var(--b);padding:0 14px;height:52px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:200;direction:rtl}
+.nav-brand{color:var(--tp);font-weight:800;font-size:14px}
+.nav-space{flex:1}
+.nb{background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:8px;padding:6px 12px;color:var(--ts);font-size:11px;cursor:pointer;font-family:var(--f);transition:all .2s;white-space:nowrap}
+.nb.active{background:linear-gradient(135deg,#c8e63c,#a8c420);border-color:var(--c);color:#1a2a00;font-weight:700}
+.nb.pu{border-color:rgba(168,85,247,.4);color:#c084fc}
+.nb.pu.active{background:linear-gradient(135deg,#a855f7,#7c3aed);border-color:#a855f7;color:#fff}
+.ubadge{border-radius:20px;padding:3px 10px;font-size:10px}
+.ubadge.admin{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(124,58,237,.15));border:1px solid rgba(168,85,247,.35);color:#c084fc}
+.ubadge.staff{background:rgba(200,230,60,.1);border:1px solid rgba(200,230,60,.25);color:var(--c)}
+.logout-btn{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:5px 10px;color:var(--r);font-size:11px;cursor:pointer;font-family:var(--f)}
+
+/* PAGES */
+.page{display:none;padding:14px 12px 40px}
+.page.show{display:block}
+
+/* STATS */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:11px;margin-bottom:14px}
+.sc{background:var(--card);border:1px solid var(--b);border-radius:13px;padding:13px;display:flex;gap:11px;align-items:center}
+.si{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sv{font-size:22px;font-weight:800;line-height:1}
+.slb{font-size:11px;color:var(--ts)}
+
+/* TOOLBAR */
+.tb{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:13px;padding:11px 13px;margin-bottom:13px;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.si2{flex:1;min-width:150px;background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:8px;padding:8px 11px;color:var(--tp);font-size:12px;outline:none;font-family:var(--f)}
+.si2:focus{border-color:var(--c)}
+.fb{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:7px;padding:5px 10px;color:var(--ts);font-size:11px;cursor:pointer;font-family:var(--f);transition:all .2s}
+.fb.active{background:linear-gradient(135deg,#c8e63c,#a8c420);border-color:var(--c);color:#1a2a00;font-weight:700}
+.rfbtn{background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:7px;padding:5px 10px;color:var(--ts);font-size:11px;cursor:pointer;font-family:var(--f)}
+
+/* TABLE */
+.tc{background:var(--card);border:1px solid var(--b);border-radius:13px;overflow:hidden}
+.th2{padding:11px 14px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:rgba(255,255,255,.025)}
+thead th{padding:9px 11px;color:var(--tm);font-size:11px;font-weight:700;text-align:right;border-bottom:1px solid var(--b);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--b);cursor:pointer;transition:background .15s}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody tr.sel{background:rgba(200,230,60,.06)}
+tbody td{padding:10px 11px;font-size:12px}
+.rc{display:flex;align-items:center;gap:7px}
+.ra{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#c8e63c,#a8c420);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#1a2a00;flex-shrink:0}
+.rn{font-weight:700;font-size:12px}
+.ri{color:var(--tm);font-size:10px}
+.bdg{border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700}
+.bn2{background:rgba(200,230,60,.15);border:1px solid rgba(200,230,60,.3);color:var(--c)}
+.ba{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--g)}
+.bw{background:rgba(234,179,8,.15);border:1px solid rgba(234,179,8,.3);color:var(--y)}
+.bsu{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--r)}
+.ab{display:flex;gap:4px}
+.at{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:5px;padding:3px 7px;color:var(--ts);font-size:10px;cursor:pointer;font-family:var(--f)}
+.at.cur{background:rgba(200,230,60,.14);border-color:var(--c);color:var(--c)}
+.dt{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:5px;padding:3px 7px;color:var(--r);font-size:10px;cursor:pointer;font-family:var(--f)}
+.emp{text-align:center;padding:40px;color:var(--ts);font-size:13px}
+
+/* DETAIL */
+.dp{background:var(--card);border:1px solid rgba(200,230,60,.35);border-radius:14px;padding:16px;margin-top:13px;display:none}
+.dpt{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.dptt{font-weight:800;font-size:14px}
+.dpc{background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:7px;padding:5px 11px;color:var(--ts);font-size:12px;cursor:pointer;font-family:var(--f)}
+.dpg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:11px}
+.dpb{background:rgba(255,255,255,.03);border-radius:10px;padding:12px}
+.dpbt{color:var(--c);font-size:12px;font-weight:700;margin-bottom:9px}
+.dpr{display:flex;justify-content:space-between;margin-bottom:7px;font-size:12px}
+.dpk{color:var(--ts)}.dpv{color:var(--tp);font-weight:600;direction:ltr;text-align:left;word-break:break-all}
+
+/* MEMBERS */
+.mwrap{max-width:700px;margin:0 auto}
+.mcard{background:var(--card);border:1px solid var(--b);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.mhead{background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(124,58,237,.1));padding:14px 18px;border-bottom:1px solid rgba(168,85,247,.2);display:flex;align-items:center;justify-content:space-between}
+.mhead h2{font-size:14px;font-weight:700}
+.add-btn{background:linear-gradient(135deg,#c8e63c,#a8c420);border:none;border-radius:9px;padding:8px 16px;color:#1a2a00;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--f)}
+.mbody{padding:16px 18px}
+.mitem{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.mavatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#c8e63c,#a8c420);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#1a2a00;flex-shrink:0}
+.minfo{flex:1}
+.mname{font-size:13px;font-weight:700}
+.memail{font-size:11px;color:var(--ts);direction:ltr}
+.mrole{font-size:10px;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.r-admin{background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c084fc}
+.r-staff{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--g)}
+.mdel{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:7px;padding:5px 10px;color:var(--r);font-size:11px;cursor:pointer;font-family:var(--f)}
+.mpass{font-size:10px;color:var(--tm);direction:ltr;font-family:monospace;margin-top:2px}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:8888;display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modal-box{background:#0d1829;border:1px solid var(--b);border-radius:18px;padding:24px;width:100%;max-width:380px;direction:rtl}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:18px}
+.mf{margin-bottom:13px}
+.mfl{font-size:12px;color:var(--ts);margin-bottom:5px}
+.mfi{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:9px;padding:10px 13px;color:var(--tp);font-size:13px;font-family:var(--f);outline:none}
+.mfi:focus{border-color:var(--c)}
+.modal-btns{display:flex;gap:8px;margin-top:16px}
+.msave{flex:1;background:linear-gradient(135deg,#c8e63c,#a8c420);border:none;border-radius:9px;padding:12px;color:#1a2a00;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--f)}
+.mcancel{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--b);border-radius:9px;padding:12px;color:var(--ts);font-size:13px;cursor:pointer;font-family:var(--f)}
+.ltr{direction:ltr}.vmt{color:var(--tm);font-size:10px}
+.ra-img{width:32px;height:32px;border-radius:7px;object-fit:cover;border:1.5px solid rgba(200,230,60,.35);flex-shrink:0}
+.det-img{width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:1px solid rgba(200,230,60,.25);display:block;margin-bottom:12px}
+.det-no-img{background:rgba(255,255,255,.03);border:1px dashed var(--b);border-radius:10px;height:60px;display:flex;align-items:center;justify-content:center;color:var(--tm);font-size:11px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">🍽️</div>
+    <h2>نظام المطاعم</h2>
+    <p>سجّل دخولك للوصول إلى لوحة التحكم</p>
+    <div class="login-field">
+      <label>البريد الإلكتروني</label>
+      <input class="login-input" type="email" id="loginEmail" placeholder="email@example.com" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-field">
+      <label>كلمة المرور</label>
+      <input class="login-input" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">🔓 تسجيل الدخول</button>
+    <div class="login-err" id="loginErr">❌ البريد أو كلمة المرور غير صحيحة</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="mainApp">
+  <nav class="nav">
+    <span class="nav-brand">📊 لوحة التحكم</span>
+    <span class="nav-space"></span>
+    <button class="nb active" id="btn-dash" onclick="showPage('dash')">📊 البيانات</button>
+    <button class="nb pu" id="btn-members" style="display:none" onclick="showPage('members')">👥 الأعضاء</button>
+    <span id="userBadge" class="ubadge"></span>
+    <button class="logout-btn" onclick="doLogout()">خروج</button>
+  </nav>
+
+  <!-- DASH PAGE -->
+  <div id="page-dash" class="page show">
+    <div class="sg">
+      <div class="sc"><div class="si" style="background:rgba(200,230,60,.15)">🍽️</div><div><div class="slb">إجمالي</div><div class="sv" id="st0" style="color:var(--c)">0</div></div></div>
+      <div class="sc"><div class="si" style="background:rgba(34,197,94,.15)">✅</div><div><div class="slb">نشط</div><div class="sv" id="st1" style="color:var(--g)">0</div></div></div>
+      <div class="sc"><div class="si" style="background:rgba(234,179,8,.15)">⏳</div><div><div class="slb">انتظار</div><div class="sv" id="st2" style="color:var(--y)">0</div></div></div>
+      <div class="sc"><div class="si" style="background:rgba(239,68,68,.15)">⛔</div><div><div class="slb">معلق</div><div class="sv" id="st3" style="color:var(--r)">0</div></div></div>
+    </div>
+    <div class="tb">
+      <input class="si2" id="srch" placeholder="🔍 بحث..." oninput="renderTable()">
+      <button class="fb active" onclick="setFilt('الكل',this)">الكل</button>
+      <button class="fb" onclick="setFilt('جديد',this)">جديد</button>
+      <button class="fb" onclick="setFilt('نشط',this)">نشط</button>
+      <button class="fb" onclick="setFilt('انتظار',this)">انتظار</button>
+      <button class="fb" onclick="setFilt('معلق',this)">معلق</button>
+      <button class="rfbtn" onclick="loadDash()">🔄</button>
+      <span style="color:var(--tm);font-size:11px" id="rCnt">0 نتيجة</span>
+    </div>
+    <div class="tc">
+      <div class="th2">
+        <span style="font-weight:700;font-size:13px">📋 قائمة المطاعم</span>
+        <span style="color:var(--tm);font-size:11px">💾 Google Sheets</span>
+      </div>
+      <div id="tBody"><div class="emp">⏳ جاري التحميل...</div></div>
+    </div>
+    <div class="dp" id="detPanel">
+      <div class="dpt">
+        <span class="dptt" id="detTitle">تفاصيل</span>
+        <button class="dpc" onclick="closeDet()">✕</button>
+      </div>
+      <div class="dpg" id="detGrid"></div>
+    </div>
+  </div>
+
+  <!-- MEMBERS PAGE -->
+  <div id="page-members" class="page">
+    <div class="mwrap">
+      <div class="mcard">
+        <div class="mhead">
+          <h2>👥 إدارة الأعضاء</h2>
+          <button class="add-btn" onclick="openAddMember()">+ إضافة عضو</button>
+        </div>
+        <div class="mbody" id="membersList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="modal" id="addMemberModal">
+  <div class="modal-box">
+    <div class="modal-title">➕ إضافة عضو جديد</div>
+    <div class="mf"><div class="mfl">الاسم الكامل</div><input class="mfi" id="nm_name" placeholder="اسم الموظف"></div>
+    <div class="mf"><div class="mfl">البريد الإلكتروني</div><input class="mfi" id="nm_email" type="email" placeholder="email@example.com" dir="ltr" style="text-align:left"></div>
+    <div class="mf"><div class="mfl">كلمة المرور</div><input class="mfi" id="nm_pass" type="text" placeholder="كلمة المرور"></div>
+    <div class="mf"><div class="mfl">الصلاحية</div>
+      <select class="mfi" id="nm_role">
+        <option value="staff">موظف — عرض فقط</option>
+        <option value="admin">مدير — صلاحيات كاملة</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="msave" onclick="saveMember()">💾 حفظ</button>
+      <button class="mcancel" onclick="closeAddMember()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzo2QAyaAjGKVJmA80tBw_tCaKc_oJ1vRX7IlcpqIZy4T5xM3l0ClOKKSrOiah-ja9vJA/exec";
+const DB_KEY = "resto-v3";
+const MEMBERS_KEY = "resto-members-v2";
+const DEFAULT_ADMIN = {name:"المدير",email:"qbd205160@gmail.com",pass:"4545695",role:"admin"};
+
+let currentUser = null;
+let allRows = [];
+let currentFilt = "الكل";
+let selectedId = null;
+let membersCache = null;
+
+// ══ MEMBERS — محفوظة على Google Sheets ══
+function getMembersLocal() {
+  try {
+    let m = JSON.parse(localStorage.getItem(MEMBERS_KEY)||"[]");
+    if (!m.find(x=>x.email===DEFAULT_ADMIN.email)) m.unshift(DEFAULT_ADMIN);
+    return m;
+  } catch { return [DEFAULT_ADMIN]; }
+}
+
+async function loadMembers() {
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getMembers&t=" + Date.now());
+    const text = await res.text();
+    const data = JSON.parse(text);
+    if (Array.isArray(data) && data.length > 0) {
+      // تأكد من وجود المدير الافتراضي دائماً
+      if (!data.find(x=>x.email===DEFAULT_ADMIN.email)) data.unshift(DEFAULT_ADMIN);
+      membersCache = data;
+      localStorage.setItem(MEMBERS_KEY, JSON.stringify(data));
+      return data;
+    }
+  } catch(e) {}
+  membersCache = getMembersLocal();
+  return membersCache;
+}
+
+function getMembers() {
+  return membersCache || getMembersLocal();
+}
+
+async function saveMembers(list) {
+  membersCache = list;
+  localStorage.setItem(MEMBERS_KEY, JSON.stringify(list));
+  try {
+    fetch(SCRIPT_URL, {
+      method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({action:"saveMembers", data:list})
+    });
+  } catch(e) {}
+}
+
+// ══ LOGIN ══
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  const btn = document.querySelector('.login-btn');
+  btn.textContent = '⏳ جاري التحقق...';
+  btn.disabled = true;
+
+  await loadMembers();
+
+  const user = getMembers().find(m => m.email.toLowerCase()===email && m.pass===pass);
+  btn.textContent = '🔓 تسجيل الدخول';
+  btn.disabled = false;
+
+  if (user) {
+    currentUser = user;
+    errEl.style.display = 'none';
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('mainApp').classList.add('show');
+    const b = document.getElementById('userBadge');
+    b.textContent = user.role==='admin' ? `👑 ${user.name}` : `👤 ${user.name}`;
+    b.className = 'ubadge ' + (user.role==='admin'?'admin':'staff');
+    if (user.role==='admin') document.getElementById('btn-members').style.display = 'inline-block';
+    loadDash();
+  } else {
+    errEl.style.display = 'block';
+    const box = document.querySelector('.login-box');
+    ['-8px','8px','-5px','0'].forEach((v,i)=>setTimeout(()=>box.style.transform=`translateX(${v})`,i*80));
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('mainApp').classList.remove('show');
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('btn-members').style.display='none';
+  document.getElementById('btn-members').classList.remove('active');
+  document.getElementById('btn-dash').classList.add('active');
+  allRows=[];
+}
+
+// ══ NAVIGATION ══
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('show'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const pg = document.getElementById('page-'+p);
+  if (pg) pg.classList.add('show');
+  const btn = document.getElementById('btn-'+p);
+  if (btn) btn.classList.add('active');
+  if (p==='dash') loadDash();
+  if (p==='members') { document.getElementById('membersList').innerHTML='<div class="emp">⏳ جاري تحميل الأعضاء...</div>'; loadMembers().then(renderMembers); }
+}
+
+// ══ DASHBOARD ══
+async function loadDash() {
+  allRows = dbLoad();
+  updateStats(); renderTable();
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getRows&t=" + Date.now());
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      const lm = {}; allRows.forEach(r=>lm[r.id]=r);
+      const merged = data.map(r=>({...r,...(lm[r.id]?{photos:lm[r.id].photos}:{})}));
+      const sids = new Set(data.map(r=>r.id));
+      allRows.forEach(r=>{if(!sids.has(r.id))merged.push(r);});
+      allRows=merged; dbSave(allRows); updateStats(); renderTable();
+    }
+  } catch(e){
+    console.log('تعذر الاتصال بـ Google Sheets:', e);
+  }
+}
+
+function dbLoad(){try{return JSON.parse(localStorage.getItem(DB_KEY)||"[]");}catch{return[];}}
+function dbSave(d){try{localStorage.setItem(DB_KEY,JSON.stringify(d));}catch{}}
+
+// *** Helper: get first available image from a row ***
+function getFirstPhoto(row) {
+  // Check direct image field first
+  if (row.image && row.image.startsWith('data:')) return row.image;
+  if (row.photo && row.photo.startsWith('data:')) return row.photo;
+  // Check photos object (from form submission)
+  if (row.photos && typeof row.photos === 'object') {
+    const keys = Object.keys(row.photos);
+    if (keys.length > 0 && row.photos[keys[0]]) return row.photos[keys[0]];
+  }
+  return null;
+}
+
+function updateStats() {
+  document.getElementById("st0").textContent=allRows.length;
+  document.getElementById("st1").textContent=allRows.filter(r=>r.status==="نشط").length;
+  document.getElementById("st2").textContent=allRows.filter(r=>["انتظار","جديد"].includes(r.status)).length;
+  document.getElementById("st3").textContent=allRows.filter(r=>r.status==="معلق").length;
+}
+
+function setFilt(val,btn) {
+  currentFilt=val;
+  document.querySelectorAll(".fb").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active"); renderTable();
+}
+
+function bc(st){return{نشط:"bdg ba",انتظار:"bdg bw",معلق:"bdg bsu",جديد:"bdg bn2"}[st]||"bdg bn2";}
+
+function renderTable() {
+  const q=document.getElementById("srch").value.toLowerCase();
+  const filtered=allRows.filter(r=>{
+    const vals=Object.values(r).join(" ").toLowerCase();
+    return(!q||vals.includes(q))&&(currentFilt==="الكل"||r.status===currentFilt);
+  });
+  document.getElementById("rCnt").textContent=filtered.length+" نتيجة";
+  if(!filtered.length){
+    document.getElementById("tBody").innerHTML=`<div class="emp">🍽️<br><br>لا توجد سجلات</div>`;
+    return;
+  }
+  const isAdmin=currentUser&&currentUser.role==='admin';
+  let html=`<div class="tw"><table><thead><tr><th>#</th><th>المطعم</th><th>التاريخ</th><th>الحالة</th>${isAdmin?'<th>تعديل</th>':''}</tr></thead><tbody>`;
+  filtered.forEach((row,i)=>{
+    const name=row.restaurantName||row["اسم المطعم"]||"—";
+    // *** FIX: extract photo from photos object ***
+    const imgSrc = getFirstPhoto(row);
+    const avatarHtml = imgSrc
+      ? `<img class="ra-img" src="${imgSrc}" alt="${name}" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\\"ra\\">${name[0]||"م"}</div>')">`
+      : `<div class="ra">${name[0]||"م"}</div>`;
+    html+=`<tr class="${selectedId===row.id?"sel":""}" onclick="selRow('${row.id}')">
+      <td class="vmt">${i+1}</td>
+      <td><div class="rc">${avatarHtml}<div><div class="rn">${name}</div><div style="color:var(--tm);font-size:10px">${row.id||""}</div></div></div></td>
+      <td style="color:var(--tm);font-size:11px">${row.submittedAt||""}</td>
+      <td><span class="${bc(row.status)}">${row.status||"جديد"}</span></td>
+      ${isAdmin?`<td><div class="ab">
+        <button class="at${row.status==="نشط"?" cur":""}" onclick="event.stopPropagation();chSt('${row.id}','نشط')">نشط</button>
+        <button class="at${row.status==="انتظار"?" cur":""}" onclick="event.stopPropagation();chSt('${row.id}','انتظار')">انتظار</button>
+        <button class="at${row.status==="معلق"?" cur":""}" onclick="event.stopPropagation();chSt('${row.id}','معلق')">معلق</button>
+        <button class="dt" onclick="event.stopPropagation();delRow('${row.id}')">🗑️</button>
+      </div></td>`:''}
+    </tr>`;
+  });
+  html+="</tbody></table></div>";
+  document.getElementById("tBody").innerHTML=html;
+}
+
+function chSt(id,st){
+  allRows=allRows.map(r=>r.id===id?{...r,status:st}:r);
+  dbSave(allRows);updateStats();renderTable();
+  if(selectedId===id)showDet(allRows.find(r=>r.id===id));
+  try{fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"updateStatus",data:{id,status:st}})});}catch(e){}
+}
+
+function delRow(id){
+  if(!confirm("حذف هذا السجل نهائياً؟"))return;
+  allRows=allRows.filter(r=>r.id!==id);
+  dbSave(allRows);updateStats();renderTable();
+  if(selectedId===id)closeDet();
+  try{fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"deleteRow",data:{id}})});}catch(e){}
+}
+
+function selRow(id){
+  if(selectedId===id){closeDet();return;}
+  selectedId=id;renderTable();showDet(allRows.find(r=>r.id===id));
+}
+
+function showDet(row){
+  if(!row)return;
+  const fields=[
+    ["اسم المطعم",row.restaurantName||row["اسم المطعم"]],
+    ["اسم الموظف",row.managerName||row["اسم الموظف المسؤول"]],
+    ["العنوان",row.address||row["العنوان"]],
+    ["رقم POS",row.posDevice||row["رقم جهاز POS"]],
+    ["رقم SIM",row.simCard||row["رقم SIM كارت POS"]],
+    ["ملاحظات",row.notes||row["ملاحظات"]],
+    ["تاريخ التسجيل",row.submittedAt],
+    ["الحالة",row.status||"جديد"]
+  ].filter(([,v])=>v&&v!=="—");
+  document.getElementById("detTitle").textContent="📋 "+(row.restaurantName||row["اسم المطعم"]||"تفاصيل");
+
+  // *** FIX: show image from photos object ***
+  const imgSrc = getFirstPhoto(row);
+  const imgHtml = imgSrc
+    ? `<img class="det-img" src="${imgSrc}" alt="صورة المطعم" onerror="this.className='det-no-img';this.alt='';this.insertAdjacentText('afterend','📷 تعذر تحميل الصورة')">`
+    : `<div class="det-no-img">📷 لا توجد صورة مضافة</div>`;
+
+  document.getElementById("detGrid").innerHTML=
+    `<div class="dpb" style="grid-column:1/-1">${imgHtml}</div>`+
+    `<div class="dpb"><div class="dpbt">📋 البيانات</div>${fields.map(([k,v])=>`<div class="dpr"><span class="dpk">${k}</span><span class="dpv">${v}</span></div>`).join('')}</div>`;
+  document.getElementById("detPanel").style.display="block";
+  document.getElementById("detPanel").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function closeDet(){selectedId=null;document.getElementById("detPanel").style.display="none";renderTable();}
+
+// ══ MEMBERS ══
+function renderMembers(){
+  const members=getMembers();
+  const html=members.map(m=>`
+    <div class="mitem">
+      <div class="mavatar">${m.name[0]||"م"}</div>
+      <div class="minfo">
+        <div class="mname">${m.name}</div>
+        <div class="memail">${m.email}</div>
+        <div class="mpass">🔑 ${m.pass}</div>
+      </div>
+      <span class="mrole ${m.role==='admin'?'r-admin':'r-staff'}">${m.role==='admin'?'👑 مدير':'👤 موظف'}</span>
+      ${m.email!==DEFAULT_ADMIN.email?`<button class="mdel" onclick="deleteMember('${m.email}')">🗑️</button>`:'<span style="font-size:10px;color:var(--tm)">محمي</span>'}
+    </div>`).join('');
+  document.getElementById('membersList').innerHTML=html||'<div class="emp">لا يوجد أعضاء</div>';
+}
+
+function openAddMember(){
+  ['nm_name','nm_email','nm_pass'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('nm_role').value='staff';
+  document.getElementById('addMemberModal').classList.add('open');
+}
+
+function closeAddMember(){document.getElementById('addMemberModal').classList.remove('open');}
+
+async function saveMember(){
+  const name=document.getElementById('nm_name').value.trim();
+  const email=document.getElementById('nm_email').value.trim().toLowerCase();
+  const pass=document.getElementById('nm_pass').value.trim();
+  const role=document.getElementById('nm_role').value;
+  if(!name||!email||!pass){alert('يرجى ملء جميع الحقول');return;}
+  const members=getMembers();
+  if(members.find(m=>m.email.toLowerCase()===email)){alert('هذا البريد مسجل مسبقاً');return;}
+  const btn=document.querySelector('.msave');
+  btn.textContent='⏳ جاري الحفظ...'; btn.disabled=true;
+  members.push({name,email,pass,role});
+  await saveMembers(members);
+  btn.textContent='💾 حفظ'; btn.disabled=false;
+  closeAddMember();
+  renderMembers();
+  alert(`✅ تم إضافة ${name}\nالبريد: ${email}\nكلمة المرور: ${pass}\n\n✅ يمكنه الدخول الآن من أي جهاز`);
+}
+
+async function deleteMember(email){
+  if(!confirm('حذف هذا العضو نهائياً؟'))return;
+  await saveMembers(getMembers().filter(m=>m.email.toLowerCase()!==email.toLowerCase()));
+  renderMembers();
+}
+
+window.onload=()=>{ loadMembers(); };
+</script>
+</body>
+</html>
